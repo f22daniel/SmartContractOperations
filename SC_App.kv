@@ -1,0 +1,698 @@
+#:import Factory kivy.factory.Factory
+
+<TabbedPanelItem>
+    markup: True
+    background_normal: ''
+    background_color: (128/255, 64/255, 0, 1)
+    bold: True
+
+<Button>
+    markup: True
+    bold: True
+    font_size: 16
+    background_normal: ''
+    background_color: (128/255, 77/255, 0, 1)
+
+<LabelDescription@Label>
+    markup: True
+    bold: True
+    font_size: 16
+    canvas.before:
+        Color:
+            rgba: (179/255, 89/255, 0 , 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<LabelValue@Label>
+    markup: True
+    bold: True
+    font_size: 16
+    color: (179/255, 89/255, 0 , 1)
+    canvas.before:
+        Color:
+            rgba: (255/255, 204/255, 128/255 , 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<SeparateLabel@Label>
+    markup: True
+    bold: True
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0 , 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<SubContractButton@Button>
+    size_hint: None, 1
+    markup: True
+    bold: True
+    font_size: 16
+    background_normal: ''
+    background_color: (128/255, 77/255, 0, 1)
+    width: 200
+
+# Tabulator 1
+<OutputLabel@Label>
+    size_hint: 1, None
+    height: 30
+    font_size: 14
+    text_size: self.size
+    padding_x: 10
+    bold: True
+    halign: 'left'
+    valign: 'middle'
+    canvas.before:
+        Color:
+            rgba: (1, 102/255, 102/255, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<InputLabel@Label>
+    size_hint: 1, None
+    height: 30
+    font_size: 14
+    padding_x: 10
+    bold: True
+    canvas.before:
+        Color:
+            rgba: (102/255, 179/255, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Input@TextInput>
+    font_size: 14
+    size_hint: 1, None
+    height: 30
+
+<LineLabel@Label>
+    size_hint: 0.01, 1
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ViewButton@Button>
+    size_hint: (1, None)
+    height: 30
+    background_normal: ''
+    background_color: 0, 0, 1, 1
+    bold: True
+    font_size: 14
+
+<NonepayableButton@Button>
+    size_hint: (1, None)
+    height: 30
+    background_normal: ''
+    background_color: 1, 173/255, 51/255, 1
+    bold: True
+    font_size: 14
+
+<PayableButton@Button>
+    size_hint: (1, None)
+    height: 30
+    background_normal: ''
+    background_color: 1, 0, 0, 1
+    bold: True
+    font_size: 14
+
+<TextInput>
+    multiline: False
+    font_size: 16
+
+<FileChooser>
+
+<MyLayout>
+    do_default_tab: False
+    tab_width: 200
+    tab_height: 40
+    size_hint: 1, 1
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    tab_pos: 'top_left'
+    # top_right, top_left, bottom_right, bottom_left, bottom_middle, right_top, left_top
+
+    TabbedPanelItem:
+        text: '[size=20][color=#ff8000][b]Connect to SC[/b][/color][/size]'
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 3
+            padding: 3
+            row_force_default: True
+            row_default_height: 20
+            # Background color in Tab
+            canvas:
+                Color:
+                    rgba: (1, 1/2, 0, 1)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            GridLayout:
+                rows: 1
+                cols: 4
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, .09
+                Button:
+                    text: 'Clear'
+                    size_hint: 0.1, 1
+                    on_release: root.clear_sc_address()
+                Button:
+                    id: UploadedSC
+                    text: 'Load Uploaded SC'
+                    size_hint: 0.2, 1
+                    on_release: root.activate_uploaded_sc()
+                    disabled: False
+                Button:
+                    id: ExternalSC
+                    text: 'Load External SC'
+                    size_hint: 0.2, 1
+                    on_release: root.connect_to_sc()
+                    disabled: False
+                TextInput:
+                    text: ''
+                    id: ContractAddress
+                    size_hint: 0.6, 1
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, 0.08
+                LabelDescription:
+                    text: 'Payable commands'
+                SeparateLabel:
+                    size_hint: 0.01, 1
+                LabelDescription:
+                    text: 'Nonpayable commands'
+                SeparateLabel:
+                    size_hint: 0.01, 1
+                LabelDescription:
+                    text: 'View commands'
+            SeparateLabel:
+                size_hint: 1, 0.007
+###########################################################
+            BoxLayout:
+                size_hint: 1, 0.6
+                orientation: 'horizontal'
+                size: root.width, root.height
+                spacing: 5
+                padding: 5
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    GridLayout:
+                        id: grid_id_1
+                        size_hint_y: None
+                        height: self.minimum_height
+                        cols: 1
+                        orientation: 'tb-lr'
+                        spacing: 2.5
+                        padding: 2.5
+                LineLabel:
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    GridLayout:
+                        id: grid_id_2
+                        size_hint_y: None
+                        height: self.minimum_height
+                        cols: 1
+                        orientation: 'tb-lr'
+                        spacing: 2.5
+                        padding: 2.5
+                LineLabel:
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    GridLayout:
+                        id: grid_id_3
+                        size_hint_y: None
+                        height: self.minimum_height
+                        cols: 1
+                        orientation: 'tb-lr'
+                        spacing: 2.5
+                        padding: 2.5
+
+            BoxLayout:
+                orientation: 'horizontal'
+                size: root.width, root.height
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, 0.4
+                BoxLayout:
+                    orientation: 'vertical'
+                    size: root.width, root.height
+                    spacing: 2.5
+                    padding: 2.5
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size: root.width, root.height
+                        size_hint: 1, .25
+                        spacing: 2.5
+                        padding: 2.5
+                        LabelDescription:
+                            text: 'Inputs'
+                            size_hint: 1, 1
+                        Button:
+                            text: 'Execute function'
+                            disabled: True
+                            id: execute
+                            size_hint: 1, 1
+                            bold: True
+                            font_size: 14
+                            on_release: root.execute_inputs()
+                    ScrollView:
+                        do_scroll_x: False
+                        do_scroll_y: True
+                        GridLayout:
+                            size_hint_y: None
+                            height: self.minimum_height
+                            id: input_layout
+                            cols: 2
+                            orientation: 'lr-tb'
+                            spacing: 2.5
+                            padding: 2.5
+                LineLabel:
+                    size_hint: 0.008, 1
+                BoxLayout:
+                    orientation: 'vertical'
+                    size: root.width, root.height
+                    spacing: 2.5
+                    padding: 2.5
+                    LabelDescription:
+                        text: 'Outputs'
+                        size_hint: 1, .2
+                        spacing: 2.5
+                    ScrollView:
+                        do_scroll_x: False
+                        do_scroll_y: True
+                        GridLayout:
+                            size_hint_y: None
+                            height: self.minimum_height
+                            id: output_layout
+                            cols: 1
+                            orientation: 'lr-tb'
+                            spacing: 2.5
+############################################################
+            LabelValue:
+                id: StatusBar_1
+                font_size: 16
+                size_hint: 1, 0.07
+                text: 'Status bar'
+
+    TabbedPanelItem:
+        text: '[size=20][color=#ff8000][b]SC Upload[/b][/color][/size]'
+        BoxLayout:
+            # Background color in Tab
+            orientation: 'vertical'
+            canvas:
+                Color:
+                    rgba: (1, 1/2, 0, 1)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            # ETH Price
+            GridLayout:
+                rows: 1
+                cols: 7
+                spacing: 5
+                padding: 5
+                size_hint: 1, .12
+                LabelDescription:
+                    size_hint: .8, 1
+                    text: 'Network Active:'
+                LabelValue:
+                    id: active_network
+                    size_hint: .6, 1
+                    text: ''
+                LabelDescription:
+                    size_hint: .7, 1
+                    text: 'ETH Price:'
+                LabelValue:
+                    id: ETH_Price
+                    size_hint: .6, 1
+                    text: ''
+                LabelDescription:
+                    size_hint: .8, 1
+                    text: 'Wallet Balance:'
+                LabelValue:
+                    id: Wallet_Balance
+                    size_hint: .8, 1
+                    text: ''
+                Button:
+                    size_hint: .5, 1
+                    text: 'Update'
+                    background_normal: ''
+                    background_color: (0/255, 77/255, 0, 1)
+                    on_release: root.update_prices()
+            # Gas Price
+            GridLayout:
+                rows: 1
+                cols: 6
+                spacing: 5
+                padding: 5
+                size_hint: 1, .12
+                # Row 1
+                LabelDescription:
+                    size_hint: .8, 1
+                    text: 'Conf. Time (main):'
+                LabelValue:
+                    id: Conf_Time
+                    size_hint: .5, 1
+                    text: ''
+                LabelDescription:
+                    size_hint: .8, 1
+                    text: 'Gas Price (main):'
+                LabelValue:
+                    id: Gas_Price
+                    size_hint: .5, 1
+                    text: ''
+                LabelDescription:
+                    size_hint: .8, 1
+                    text: 'Gas Price (USD):'
+                LabelValue:
+                    id: Gas_Price_USD
+                    size_hint: .8, 1
+                    text: ''
+            # Contract file load
+            GridLayout:
+                rows: 1
+                cols: 4
+                spacing: 5
+                padding: 2.5
+                size_hint: 1, .1
+                Button:
+                    id: ChooseSC
+                    text: 'Choose SC'
+                    size_hint: .15, 1
+                    on_release: root.file_chooser()
+                    disabled: False
+                Button:
+                    text: 'Clear'
+                    size_hint: .15, 1
+                    on_release: root.clear()
+                Button:
+                    id: compile_sc
+                    text: 'Compile'
+                    size_hint: .15, 1
+                    on_release: root.compile()
+                    disabled: True
+                TextInput:
+                    font_size: 16
+                    size_hint: .8, 1
+                    id: FilePath
+                    text: ''
+                    valign: 'center'
+            # Contract selection
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 5
+                padding: 2.5
+                size_hint: 1, 0.1
+                LabelDescription:
+                    id: select_sc
+                    size_hint: 0.15, 1
+                    text: 'Select SC:'
+                    # on_release: root.select_subcontract()
+                    # disabled: True
+                ScrollView:
+                    do_scroll_y: False
+                    do_scroll_x: True
+                    GridLayout:
+                        size_hint_x: None
+                        width: self.minimum_width
+                        rows: 1
+                        orientation: 'lr-tb'
+                        spacing: 2.5
+                        padding: 2.5
+                        # size_hint: 1, 1
+                        id: ContractSelection
+            # Constructor
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, .09
+                LabelDescription:
+                    text: 'Constructor'
+            GridLayout:
+                rows: 2
+                orientation: 'tb-lr'
+                id: Constructor
+                padding: 2.5
+                spacing: 0
+                size_hint: 1, 0.2
+            # Smart Contract Operations
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 5
+                padding: 2.5
+                size_hint: 1, 0.1
+                LabelDescription:
+                    text: 'Smart Contract Operations'
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 2
+                padding: 2
+                size_hint: 1, 0.3
+                GridLayout:
+                    rows: 1
+                    cols: 6
+                    spacing: 5
+                    padding: 2
+                    size_hint: 1, 0.3
+                    # Row 1
+                    Button:
+                        id: Calculate
+                        text: 'Calculate'
+                        size_hint: .8, 1
+                        on_release: root.calculate_upload()
+                        disabled: True
+                    Button:
+                        id: DeploySC
+                        text: 'Deploy SC'
+                        size_hint: .8, 1
+                        on_release: root.deploy_sc()
+                        disabled: True
+                    LabelDescription:
+                        text: 'Gas Estimate:'
+                        size_hint: 1, 1
+
+                    LabelValue:
+                        text: ''
+                        size_hint: 1, 1
+                        id: GasEstimate
+                    LabelDescription:
+                        text: 'Gas Cost:'
+                        size_hint: .8, 1
+                    LabelValue:
+                        text: ''
+                        size_hint: .8, 1
+                        id: GasCost
+                GridLayout:
+                    rows: 1
+                    cols: 6
+                    spacing: 5
+                    padding: 2
+                    size_hint: 1, 0.3
+                    # Row 2
+                    LabelDescription:
+                        text: 'Gas Cost (USD):'
+                        size_hint: 1.1, 1
+                    LabelValue:
+                        text: ''
+                        size_hint: 1, 1
+                        id: GasCostUSD
+                    LabelDescription:
+                        text: 'Upload Cost:'
+                        size_hint: .9, 1
+                    LabelValue:
+                        text: ''
+                        size_hint: 1, 1
+                        id: UploadCost
+                    LabelDescription:
+                        text: 'Upload Cost (USD):'
+                        size_hint: 1.2, 1
+                    LabelValue:
+                        text: ''
+                        size_hint: .8, 1
+                        id: UploadCostUSD
+
+                LabelValue:
+                    id: StatusBar
+                    font_size: 16
+                    size_hint: 1, 0.3
+                    text: 'Status bar'
+
+    TabbedPanelItem:
+        text: '[size=20][color=#ff8000][b]Settings[/b][/color][/size]'
+        BoxLayout:
+            orientation: 'vertical'
+            GridLayout:
+                spacing: 5
+                padding: 5
+                rows: 11
+                cols:3
+                # Background color in Tab
+                canvas:
+                    Color:
+                        rgba: (1, 1/2, 0, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                # Wallet address
+                LabelDescription:
+                    text: 'Wallet Address'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.address_enter()
+                TextInput:
+                    id: AddressEnter
+                    text: ''
+                # Private Key
+                LabelDescription:
+                    text: 'Private Key'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.private_key_enter()
+                TextInput:
+                    id: PrivateKeyEnter
+                    text: ''
+                # Ganache Address
+                LabelDescription:
+                    text: 'Ganache Address'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.ganache_address_enter()
+                TextInput:
+                    id: GanacheAddressEnter
+                    text: ''
+                # Ganache Private Key
+                LabelDescription:
+                    text: 'Ganache Private Key'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.ganache_private_key_enter()
+                TextInput:
+                    id: GanachePrivateKeyEnter
+                    text: ''
+                # API
+                LabelDescription:
+                    text: 'API'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.api_enter()
+                TextInput:
+                    id: APIEnter
+                    text: ''
+                # Infura
+                LabelDescription:
+                    text: 'Infura'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.infura_enter()
+                TextInput:
+                    id: InfuraEnter
+                    text: ''
+                # Gas Limit
+                LabelDescription:
+                    text: 'Gas Limit'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.gas_enter()
+                TextInput:
+                    id: GasEnter
+                    text: ''
+                # Ganache
+                LabelDescription:
+                    text: 'Ganache RPC'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.ganache_rpc_enter()
+                TextInput:
+                    id: GanacheRPCEnter
+                    text: ''
+                # Ganache ID
+                LabelDescription:
+                    text: 'Ganache ID'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.ganache_id_enter()
+                TextInput:
+                    id: GanacheIDEnter
+                    text: ''
+                # Solidity Compiler
+                LabelDescription:
+                    text: 'Solidity Compiler'
+                    size_hint: 0.35, 1
+                Button:
+                    text: 'Confirm'
+                    size_hint: 0.2, 1
+                    on_release: root.solidity_compiler_enter()
+                TextInput:
+                    id: SolidityCompiler
+                    text: ''
+            GridLayout:
+                spacing: 5
+                padding: 5
+                rows: 1
+                cols: 7
+                size_hint: 1, .1
+                # Background color in Tab
+                canvas:
+                    Color:
+                        rgba: (1, 1/2, 0, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                LabelDescription:
+                    text: 'Network selection'
+                    size_hint: 1.8, 1
+                ToggleButton:
+                    id: Mainnet
+                    text: 'Mainnet'
+                    on_state: root.mainnet_network()
+                ToggleButton:
+                    id: Goerli
+                    text: 'Goerli'
+                    on_state: root.goerli_network()
+                ToggleButton:
+                    id: Kovan
+                    text: 'Kovan'
+                    on_state: root.kovan_network()
+                ToggleButton:
+                    id: Rinkeby
+                    text: 'Rinkeby'
+                    on_state: root.rinkeby_network()
+                ToggleButton:
+                    id: Ropsten
+                    text: 'Ropsten'
+                    on_state: root.ropsten_network()
+                ToggleButton:
+                    id: Ganache
+                    text: 'Ganache'
+                    on_state: root.ganache_network()
