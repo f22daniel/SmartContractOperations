@@ -36,9 +36,18 @@
             size: self.size
             pos: self.pos
 
+<LabelDescription_2@LabelDescription>
+    size_hint: 1, None
+    height: 25
+
+<LabelValue_2@LabelValue>
+    size_hint: 1, None
+    height: 25
+
 <SeparateLabel@Label>
     markup: True
     bold: True
+    size_hint: 0.01, 1
     canvas.before:
         Color:
             rgba: (0, 0, 0 , 1)
@@ -60,6 +69,7 @@
     size_hint: 1, None
     height: 30
     font_size: 14
+    # Text alignment adjust
     text_size: self.size
     padding_x: 10
     bold: True
@@ -125,7 +135,19 @@
 
 <TextInput>
     multiline: False
-    font_size: 16
+    font_size: 14
+
+<ConstructorLabel@Label>
+    size_hint: None, 1
+    width: 150
+    canvas.before:
+        Color:
+            rgba: (179 / 255, 89 / 255, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ClickInput@TextInput>
 
 <FileChooser>
 
@@ -153,6 +175,7 @@
                 Rectangle:
                     size: self.size
                     pos: self.pos
+            # Load Smart Contract
             GridLayout:
                 rows: 1
                 cols: 4
@@ -171,7 +194,7 @@
                     disabled: False
                 Button:
                     id: ExternalSC
-                    text: 'Load External SC'
+                    text: 'Load External SC:'
                     size_hint: 0.2, 1
                     on_release: root.connect_to_sc()
                     disabled: False
@@ -179,6 +202,8 @@
                     text: ''
                     id: ContractAddress
                     size_hint: 0.6, 1
+                    on_focus: root.test_focus(self.focus)
+            # Commands line
             BoxLayout:
                 orientation: 'horizontal'
                 spacing: 2.5
@@ -187,18 +212,29 @@
                 LabelDescription:
                     text: 'Payable commands'
                 SeparateLabel:
-                    size_hint: 0.01, 1
                 LabelDescription:
                     text: 'Nonpayable commands'
                 SeparateLabel:
-                    size_hint: 0.01, 1
                 LabelDescription:
                     text: 'View commands'
+                SeparateLabel:
+                Button:
+                    text: 'Update'
+                    size_hint: 0.6, 1
+                    background_normal: ''
+                    background_color: (0/255, 77/255, 0, 1)
+                    on_release: root.update_prices()
+                Button:
+                    size_hint: 0.6, 1
+                    text: 'Reset Gas meter'
+                    background_normal: ''
+                    background_color: (0/255, 77/255, 0, 1)
+                    on_release: root.reset_gas_meter()
             SeparateLabel:
                 size_hint: 1, 0.007
-###########################################################
+            # SC buttons
             BoxLayout:
-                size_hint: 1, 0.6
+                size_hint: 1, 0.55
                 orientation: 'horizontal'
                 size: root.width, root.height
                 spacing: 5
@@ -207,7 +243,7 @@
                     do_scroll_x: False
                     do_scroll_y: True
                     GridLayout:
-                        id: grid_id_1
+                        id: payable_buttons
                         size_hint_y: None
                         height: self.minimum_height
                         cols: 1
@@ -219,7 +255,7 @@
                     do_scroll_x: False
                     do_scroll_y: True
                     GridLayout:
-                        id: grid_id_2
+                        id: nonpayable_buttons
                         size_hint_y: None
                         height: self.minimum_height
                         cols: 1
@@ -231,42 +267,169 @@
                     do_scroll_x: False
                     do_scroll_y: True
                     GridLayout:
-                        id: grid_id_3
+                        id: view_buttons
                         size_hint_y: None
                         height: self.minimum_height
                         cols: 1
                         orientation: 'tb-lr'
                         spacing: 2.5
                         padding: 2.5
-
+                LineLabel:
+                ScrollView:
+                    do_scroll_x: False
+                    do_scroll_y: True
+                    size_hint: 1.2, 1
+                    GridLayout:
+                        size_hint_y: None
+                        height: self.minimum_height
+                        rows: 10
+                        cols: 2
+                        orientation: 'tb-lr'
+                        spacing: 2.5
+                        padding: 2.5
+                        LabelDescription_2:
+                            text: 'ETH Price'
+                        LabelValue_2:
+                            id: eth_price_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Wallet Balance'
+                        LabelValue_2:
+                            id: wallet_balance_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Network Active'
+                        LabelValue_2:
+                            id: network_active_sc
+                            text: ''
+                        # Row 2
+                        LabelDescription_2:
+                            text: 'Address Active'
+                        LabelValue_2:
+                            id: address_active_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Total Gas used'
+                        LabelValue_2:
+                            id: total_gas_used_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Total Gwei spent'
+                        LabelValue_2:
+                            id: total_gwei_spent_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Total USD spent:'
+                        LabelValue_2:
+                            id: total_usd_spent_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Last Gas spent'
+                        LabelValue_2:
+                            id: last_gas_spent_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Last Gwei spent'
+                        LabelValue_2:
+                            id: last_gwei_spent_sc
+                            text: ''
+                        LabelDescription_2:
+                            text: 'Last USD spent'
+                        LabelValue_2:
+                            id: last_usd_spent_sc
+                            text: ''
+                # Gas Estimate
+            GridLayout:
+                rows: 1
+                cols: 9
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, .08
+                Button:
+                    text: 'Calculate'
+                    disabled: True
+                    id: calculate_transaction
+                    size_hint: .5, 1
+                    bold: True
+                    on_release: root.calculate_transaction()
+                SeparateLabel:
+                Button:
+                    id: currency_selection
+                    text: ''
+                    on_release: root.currency_selection()
+                    size_hint: .7, 1
+                LabelDescription:
+                    text: 'Gas Estimate'
+                    size_hint: .7, 1
+                LabelDescription:
+                    text: 'Gas Cost'
+                    size_hint: 0.7, 1
+                LabelDescription:
+                    text: 'Gas Cost (USD)'
+                    size_hint: .8, 1
+                LabelDescription:
+                    text: 'Transaction Cost'
+                    size_hint: .8, 1
+                LabelDescription:
+                    text: 'Transaction Cost (USD)'
+                LabelDescription:
+                    text: 'Verification Status'
+                    size_hint: .9, 1
+            GridLayout:
+                rows: 1
+                cols: 9
+                spacing: 2.5
+                padding: 2.5
+                size_hint: 1, .08
+                Button:
+                    text: 'Transact'
+                    disabled: True
+                    id: execute
+                    size_hint: .5, 1
+                    bold: True
+                    on_release: root.transact()
+                SeparateLabel:
+                TextInput:
+                    id: currency_input
+                    font_size: 12
+                    size_hint: .7, 1
+                LabelValue:
+                    id: gas_transaction
+                    text: ''
+                    size_hint: 0.7, 1
+                LabelValue:
+                    id: gas_cost_transaction
+                    text: ''
+                    size_hint: 0.7, 1
+                LabelValue:
+                    id: gas_cost_transaction_usd
+                    text: ''
+                    size_hint: .8, 1
+                LabelValue:
+                    id: gwei_cost_transaction
+                    text: ''
+                    size_hint: .8, 1
+                LabelValue:
+                    id: usd_cost_transaction
+                    text: ''
+                LabelValue:
+                    id: verification_status_sc
+                    text: ''
+                    size_hint: .9, 1
             BoxLayout:
                 orientation: 'horizontal'
                 size: root.width, root.height
                 spacing: 2.5
                 padding: 2.5
-                size_hint: 1, 0.4
+                size_hint: 1, 0.35
                 BoxLayout:
                     orientation: 'vertical'
                     size: root.width, root.height
                     spacing: 2.5
                     padding: 2.5
-                    BoxLayout:
-                        orientation: 'horizontal'
-                        size: root.width, root.height
+                    LabelDescription:
+                        text: 'Inputs'
                         size_hint: 1, .25
-                        spacing: 2.5
-                        padding: 2.5
-                        LabelDescription:
-                            text: 'Inputs'
-                            size_hint: 1, 1
-                        Button:
-                            text: 'Execute function'
-                            disabled: True
-                            id: execute
-                            size_hint: 1, 1
-                            bold: True
-                            font_size: 14
-                            on_release: root.execute_inputs()
                     ScrollView:
                         do_scroll_x: False
                         do_scroll_y: True
@@ -287,7 +450,7 @@
                     padding: 2.5
                     LabelDescription:
                         text: 'Outputs'
-                        size_hint: 1, .2
+                        size_hint: 1, .25
                         spacing: 2.5
                     ScrollView:
                         do_scroll_x: False
@@ -299,87 +462,158 @@
                             cols: 1
                             orientation: 'lr-tb'
                             spacing: 2.5
-############################################################
             LabelValue:
                 id: StatusBar_1
                 font_size: 16
-                size_hint: 1, 0.07
+                size_hint: 1, 0.08
                 text: 'Status bar'
-
+# ######################################## SC Upload ##########################################
     TabbedPanelItem:
         text: '[size=20][color=#ff8000][b]SC Upload[/b][/color][/size]'
         BoxLayout:
             # Background color in Tab
             orientation: 'vertical'
+            padding: 3
+            spacing: 2.5
             canvas:
                 Color:
                     rgba: (1, 1/2, 0, 1)
                 Rectangle:
                     size: self.size
                     pos: self.pos
-            # ETH Price
+            # Row 1
             GridLayout:
-                rows: 1
-                cols: 7
+                rows: 2
+                cols: 8
                 spacing: 5
                 padding: 5
-                size_hint: 1, .12
-                LabelDescription:
-                    size_hint: .8, 1
-                    text: 'Network Active:'
-                LabelValue:
-                    id: active_network
-                    size_hint: .6, 1
-                    text: ''
+                size_hint: 1, .2
                 LabelDescription:
                     size_hint: .7, 1
-                    text: 'ETH Price:'
-                LabelValue:
-                    id: ETH_Price
-                    size_hint: .6, 1
-                    text: ''
+                    text: 'ETH Price'
                 LabelDescription:
-                    size_hint: .8, 1
-                    text: 'Wallet Balance:'
-                LabelValue:
-                    id: Wallet_Balance
-                    size_hint: .8, 1
-                    text: ''
+                    size_hint: .9, 1
+                    text: 'Network Active'
+                LabelDescription:
+                    size_hint: 1, 1
+                    text: 'Address Active'
+                LabelDescription:
+                    size_hint: 1, 1
+                    text: 'Wallet Balance'
+                LabelDescription:
+                    size_hint: 1, 1
+                    text: 'Gas Price (main)'
+                LabelDescription:
+                    size_hint: 1, 1
+                    text: 'Gas Price (USD)'
+                LabelDescription:
+                    size_hint: 1.1, 1
+                    text: 'Conf. Time (main)'
                 Button:
-                    size_hint: .5, 1
+                    size_hint: 1, 1
                     text: 'Update'
                     background_normal: ''
                     background_color: (0/255, 77/255, 0, 1)
                     on_release: root.update_prices()
-            # Gas Price
-            GridLayout:
-                rows: 1
-                cols: 6
-                spacing: 5
-                padding: 5
-                size_hint: 1, .12
-                # Row 1
-                LabelDescription:
-                    size_hint: .8, 1
-                    text: 'Conf. Time (main):'
+                # Row 2
                 LabelValue:
-                    id: Conf_Time
-                    size_hint: .5, 1
+                    id: ETH_Price
+                    size_hint: .7, 1
                     text: ''
-                LabelDescription:
-                    size_hint: .8, 1
-                    text: 'Gas Price (main):'
+                LabelValue:
+                    id: active_network
+                    size_hint: .9, 1
+                    text: ''
+                LabelValue:
+                    size_hint: 1, 1
+                    id: address_active
+                    text: ''
+                LabelValue:
+                    id: Wallet_Balance
+                    size_hint: 1, 1
+                    text: ''
                 LabelValue:
                     id: Gas_Price
-                    size_hint: .5, 1
+                    size_hint: 1, 1
                     text: ''
-                LabelDescription:
-                    size_hint: .8, 1
-                    text: 'Gas Price (USD):'
                 LabelValue:
                     id: Gas_Price_USD
-                    size_hint: .8, 1
+                    size_hint: 1, 1
                     text: ''
+                LabelValue:
+                    id: Conf_Time
+                    size_hint: 1.1, 1
+                    text: ''
+                Button:
+                    size_hint: 1, 1
+                    text: 'Reset Gas meter'
+                    background_normal: ''
+                    background_color: (0/255, 77/255, 0, 1)
+                    on_release: root.reset_gas_meter()
+            SeparateLabel:
+                size_hint: 1, 0.007
+            GridLayout:
+                rows: 2
+                cols: 7
+                spacing: 5
+                padding: 5
+                orientation: 'tb-lr'
+                size_hint: 1, .2
+                LabelDescription:
+                    text: 'Compiler set'
+                    size_hint: 1.1, 1
+                LabelValue:
+                    id: compiler_set
+                    text: ''
+                    size_hint: 1.1, 1
+                LabelDescription:
+                    text: 'Total Gas used'
+                    size_hint: .9, 1
+                LabelValue:
+                    id: total_gas_used
+                    text: ''
+                    size_hint: .9, 1
+                LabelDescription:
+                    text: 'Total Gwei spent'
+                    size_hint: 1, 1
+                LabelValue:
+                    id: total_gwei_spent
+                    text: ''
+                    size_hint: 1, 1
+                LabelDescription:
+                    text: 'Total USD spent'
+                    size_hint: .9, 1
+                LabelValue:
+                    id: total_usd_spent
+                    text: ''
+                    size_hint: .9, 1
+                LabelDescription:
+                    text: 'Last Gas spent'
+                    size_hint: .9, 1
+                LabelValue:
+                    id: last_gas_spent
+                    text: ''
+                    size_hint: .9, 1
+                LabelDescription:
+                    text: 'Last Gwei spent'
+                    size_hint: .9, 1
+                LabelValue:
+                    id: last_gwei_spent
+                    text: ''
+                    size_hint: .9, 1
+                LabelDescription:
+                    text: 'Last USD spent'
+                    size_hint: .9, 1
+                LabelValue:
+                    id: last_usd_spent
+                    text: ''
+                    size_hint: .9, 1
+
+            LabelDescription:
+                font_size: 16
+                size_hint: 1, 0.08
+                text: 'File selection'
+# ####################################
             # Contract file load
             GridLayout:
                 rows: 1
@@ -433,103 +667,106 @@
                         padding: 2.5
                         # size_hint: 1, 1
                         id: ContractSelection
+            LabelDescription:
+                text: 'Constructor'
+                size_hint: 1, .08
             # Constructor
             BoxLayout:
                 orientation: 'vertical'
                 spacing: 2.5
                 padding: 2.5
-                size_hint: 1, .09
-                LabelDescription:
-                    text: 'Constructor'
-            GridLayout:
-                rows: 2
-                orientation: 'tb-lr'
-                id: Constructor
-                padding: 2.5
-                spacing: 0
-                size_hint: 1, 0.2
+                size_hint: 1, .2
+                ScrollView:
+                    do_scroll_y: False
+                    do_scroll_x: True
+                    GridLayout:
+                        size_hint_x: None
+                        width: self.minimum_width
+                        rows: 2
+                        orientation: 'tb-lr'
+                        id: Constructor
+                        padding: 2.5
+                        spacing: 2.5
+                        size_hint: 1, 1
             # Smart Contract Operations
-            BoxLayout:
-                orientation: 'vertical'
-                spacing: 5
-                padding: 2.5
-                size_hint: 1, 0.1
-                LabelDescription:
-                    text: 'Smart Contract Operations'
+            LabelDescription:
+                text: 'Smart Contract Operations'
+                spacing: 3
+                size_hint: 1, 0.08
             BoxLayout:
                 orientation: 'vertical'
                 spacing: 2
                 padding: 2
                 size_hint: 1, 0.3
                 GridLayout:
-                    rows: 1
-                    cols: 6
-                    spacing: 5
-                    padding: 2
-                    size_hint: 1, 0.3
+                    rows: 2
+                    cols: 7
+                    spacing: 3
+                    padding: 3
+                    size_hint: 1, 0.6
                     # Row 1
                     Button:
                         id: Calculate
                         text: 'Calculate'
-                        size_hint: .8, 1
+                        size_hint: .6, 1
                         on_release: root.calculate_upload()
                         disabled: True
+                    LabelDescription:
+                        text: 'Gas Estimate'
+                        size_hint: 1, 1
+                    LabelDescription:
+                        text: 'Upload Cost'
+                        size_hint: 1, 1
+                    LabelDescription:
+                        text: 'Gas Cost'
+                        size_hint: 1, 1
+                    LabelDescription:
+                        text: 'Upload Cost (USD)'
+                        size_hint: 1, 1
+                    LabelDescription:
+                        text: 'Gas Cost (USD)'
+                        size_hint: 1, 1
+                    LabelDescription:
+                        text: 'Verification status'
+                        size_hint: 1, 1
+                    # Row2
                     Button:
                         id: DeploySC
                         text: 'Deploy SC'
-                        size_hint: .8, 1
+                        size_hint: .6, 1
                         on_release: root.deploy_sc()
                         disabled: True
-                    LabelDescription:
-                        text: 'Gas Estimate:'
-                        size_hint: 1, 1
-
                     LabelValue:
                         text: ''
                         size_hint: 1, 1
                         id: GasEstimate
-                    LabelDescription:
-                        text: 'Gas Cost:'
-                        size_hint: .8, 1
-                    LabelValue:
-                        text: ''
-                        size_hint: .8, 1
-                        id: GasCost
-                GridLayout:
-                    rows: 1
-                    cols: 6
-                    spacing: 5
-                    padding: 2
-                    size_hint: 1, 0.3
-                    # Row 2
-                    LabelDescription:
-                        text: 'Gas Cost (USD):'
-                        size_hint: 1.1, 1
-                    LabelValue:
-                        text: ''
-                        size_hint: 1, 1
-                        id: GasCostUSD
-                    LabelDescription:
-                        text: 'Upload Cost:'
-                        size_hint: .9, 1
                     LabelValue:
                         text: ''
                         size_hint: 1, 1
                         id: UploadCost
-                    LabelDescription:
-                        text: 'Upload Cost (USD):'
-                        size_hint: 1.2, 1
                     LabelValue:
                         text: ''
-                        size_hint: .8, 1
+                        size_hint: 1, 1
+                        id: GasCost
+                    LabelValue:
+                        text: ''
+                        size_hint: 1, 1
                         id: UploadCostUSD
+                    LabelValue:
+                        text: ''
+                        size_hint: 1, 1
+                        id: GasCostUSD
+                    LabelValue:
+                        id: verification_status
+                        text: ''
+                        size_hint: 1, 1
 
                 LabelValue:
                     id: StatusBar
                     font_size: 16
                     size_hint: 1, 0.3
                     text: 'Status bar'
-
+# ############################################ Settings Panel ##################################
     TabbedPanelItem:
         text: '[size=20][color=#ff8000][b]Settings[/b][/color][/size]'
         BoxLayout:
@@ -537,8 +774,8 @@
             GridLayout:
                 spacing: 5
                 padding: 5
-                rows: 11
-                cols:3
+                rows: 10
+                cols:2
                 # Background color in Tab
                 canvas:
                     Color:
@@ -549,119 +786,90 @@
                 # Wallet address
                 LabelDescription:
                     text: 'Wallet Address'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.address_enter()
                 TextInput:
                     id: AddressEnter
                     text: ''
+                    on_focus: root.address_enter(self.focus)
                 # Private Key
                 LabelDescription:
                     text: 'Private Key'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.private_key_enter()
                 TextInput:
                     id: PrivateKeyEnter
                     text: ''
+                    on_focus: root.private_key_enter(self.focus)
                 # Ganache Address
                 LabelDescription:
                     text: 'Ganache Address'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.ganache_address_enter()
                 TextInput:
                     id: GanacheAddressEnter
                     text: ''
+                    on_focus: root.ganache_address_enter(self.focus)
                 # Ganache Private Key
                 LabelDescription:
                     text: 'Ganache Private Key'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.ganache_private_key_enter()
                 TextInput:
                     id: GanachePrivateKeyEnter
                     text: ''
+                    on_focus: root.ganache_private_key_enter(self.focus)
                 # API
                 LabelDescription:
                     text: 'API'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.api_enter()
                 TextInput:
                     id: APIEnter
                     text: ''
+                    on_focus: root.api_enter(self.focus)
                 # Infura
                 LabelDescription:
                     text: 'Infura'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.infura_enter()
                 TextInput:
                     id: InfuraEnter
                     text: ''
+                    on_focus: root.infura_enter(self.focus)
                 # Gas Limit
                 LabelDescription:
                     text: 'Gas Limit'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.gas_enter()
                 TextInput:
                     id: GasEnter
                     text: ''
+                    on_focus: root.gas_enter(self.focus)
                 # Ganache
                 LabelDescription:
                     text: 'Ganache RPC'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.ganache_rpc_enter()
                 TextInput:
                     id: GanacheRPCEnter
                     text: ''
+                    on_focus: root.ganache_rpc_enter(self.focus)
                 # Ganache ID
                 LabelDescription:
                     text: 'Ganache ID'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.ganache_id_enter()
                 TextInput:
                     id: GanacheIDEnter
                     text: ''
+                    on_focus: root.ganache_id_enter(self.focus)
                 # Solidity Compiler
                 LabelDescription:
                     text: 'Solidity Compiler'
-                    size_hint: 0.35, 1
-                Button:
-                    text: 'Confirm'
                     size_hint: 0.2, 1
-                    on_release: root.solidity_compiler_enter()
                 TextInput:
                     id: SolidityCompiler
                     text: ''
+                    on_focus: root.solidity_compiler_enter(self.focus)
             GridLayout:
                 spacing: 5
                 padding: 5
-                rows: 1
+                rows: 2
                 cols: 7
-                size_hint: 1, .1
+                size_hint: 1, .2
+                orientation: 'lr-tb'
                 # Background color in Tab
                 canvas:
                     Color:
@@ -669,6 +877,34 @@
                     Rectangle:
                         size: self.size
                         pos: self.pos
+                LabelDescription:
+                    text: 'Wallet Address selection'
+                    size_hint: 1.8, 1
+                ToggleButton:
+                    id: Address1
+                    text: 'Address 1'
+                    on_state: root.address_1()
+                ToggleButton:
+                    id: Address2
+                    text: 'Address 2'
+                    on_state: root.address_2()
+                ToggleButton:
+                    id: Address3
+                    text: 'Address 3'
+                    on_state: root.address_3()
+                ToggleButton:
+                    id: Address4
+                    text: 'Address 4'
+                    on_state: root.address_4()
+                ToggleButton:
+                    id: Address5
+                    text: 'Address 5'
+                    on_state: root.address_5()
+                ToggleButton:
+                    id: Address6
+                    text: 'Address 6'
+                    on_state: root.address_6()
+                # Network selection
                 LabelDescription:
                     text: 'Network selection'
                     size_hint: 1.8, 1
