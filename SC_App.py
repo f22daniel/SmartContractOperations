@@ -1,9 +1,7 @@
 import ast
 import binascii
-import time
 # from kivy.clock import Clock
 import json
-import threading
 
 from functools import partial
 import requests.exceptions
@@ -12,7 +10,6 @@ import web3
 from etherscan import Etherscan
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.graphics import *
 from kivy.lang import Builder
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -85,10 +82,8 @@ upload_cost_usd = ''
 Builder.load_file('SC_App.kv')
 Window.size = (1100, 600)
 settings = {'Address': '', 'Private Key': '', 'API': '', 'Infura': '', 'Gas Limit': '', 'Ganache Address': '',
-            'Ganache ID': '', 'Mainnet': '', 'Goerli': '', 'Kovan': '', 'Rinkeby': '', 'Ropsten': '', 'Ganache': '',
-            'Infura Link': '', 'Currency': '', 'Network': '', 'Solidity Compiler': '', 'Chain ID': '',
-            'Last Contract': '', 'Ganache RPC': '', 'Ganache Private Key': '', 'Address 1_State': '', 'Address 2_State': '',
-            'Address 3_State': '', 'Address 4_State': '', 'Address 5_State': '', 'Address 6_State': '',
+            'Ganache ID': '', 'Infura Link': '', 'Currency': '', 'Network': '', 'Solidity Compiler': '',
+            'Last Contract': '', 'Ganache RPC': '', 'Ganache Private Key': '','Chain ID': '', 'Full Compiler': '',
             'Address 1': '', 'Address 2': '','Address 3': '', 'Address 4': '', 'Address 5': '', 'Address 6': '',
             'Private Key 1':'', 'Private Key 2':'', 'Private Key 3':'', 'Private Key 4':'', 'Private Key 5':'',
             'Private Key 6':'', 'Total Gas used': '', 'Total Gwei spent': '', 'Total USD spent': ''}
@@ -120,16 +115,15 @@ class MyLayout(TabbedPanel):
             if settings.get('Network') == 'ganache':
                 w3_balance = w3.eth.getBalance(settings.get('Ganache Address'))
                 w3_balance = f'{str(eval(f"{w3_balance}*0.000000000000000001"))}'
-                w3_balance = round(float(w3_balance), 4)
+                w3_balance = round(float(w3_balance), 5)
                 self.ids.Wallet_Balance.text = str(f'{w3_balance} ETH')
                 self.ids.wallet_balance_sc.text = str(f'{w3_balance} ETH')
             else:
                 balance = w3.eth.getBalance(f'{settings.get("Address")}')
                 balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
-                balance = round(float(balance), 4)
+                balance = round(float(balance), 5)
                 self.ids.Wallet_Balance.text = str(f'{balance} ETH')
                 self.ids.wallet_balance_sc.text = str(f'{balance} ETH')
-                # print(self.ids.Wallet_Balance.text)
 
             # Network Parameters
             API = settings.get("API")
@@ -139,9 +133,10 @@ class MyLayout(TabbedPanel):
             price = ethsc.get_eth_last_price()
             eth_price = price['ethusd']
             eth_price = round(float(eth_price), 0)
-
             self.ids.ETH_Price.text = f'{int(eth_price)} USD'
             self.ids.eth_price_sc.text = f'{int(eth_price)} USD'
+            # Compiler setup
+            self.ids.compiler_set.text = settings.get('Full Compiler')
             # Get Gas Price
             gas = ethsc.get_gas_oracle()
             gas_price = gas['SafeGasPrice']
@@ -156,56 +151,20 @@ class MyLayout(TabbedPanel):
             self.ids.currency_selection.text = 'Wei'
 
             # Network Selection
-            if settings['Mainnet'] == 'down':
-                self.ids.Mainnet.state = 'down'
-                self.ids.active_network.text = 'Mainnet'
-                self.ids.network_active_sc.text = 'Mainnet'
-                settings.update({'Network': 'main'})
-                settings.update({'Infura Link': f'https://mainnet.infura.io/v3/{settings.get("Infura")}'})
+            if settings.get('Network') != 'ganache':
+                self.ids[f'{settings.get("Network").title()}'].state = 'down'
+                self.ids.active_network.text = f'{settings.get("Network").title()}'
+                self.ids.network_active_sc.text = f'{settings.get("Network").title()}'
+                settings.update({'Infura Link': f'https://{settings.get("Network")}.infura.io/v3/{settings.get("Infura")}'})
                 w3 = Web3(Web3.HTTPProvider(settings.get('Infura Link')))
-                settings.update({'Chain ID': 1})
                 chain_id = settings.get('Chain ID')
-            if settings['Goerli'] == 'down':
-                self.ids.Goerli.state = 'down'
-                self.ids.active_network.text = 'Goerli'
-                self.ids.network_active_sc.text = 'Goerli'
-                settings.update({'Network': 'goerli'})
-                settings.update({'Infura Link': f'https://goerli.infura.io/v3/{settings.get("Infura")}'})
-                w3 = Web3(Web3.HTTPProvider(settings.get('Infura Link')))
-                settings.update({'Chain ID': 5})
-                chain_id = settings.get('Chain ID')
-            if settings['Kovan'] == 'down':
-                self.ids.Kovan.state = 'down'
-                self.ids.active_network.text = 'Kovan'
-                self.ids.network_active_sc.text = 'Kovan'
-                settings.update({'Network': 'kovan'})
-                settings.update({'Infura Link': f'https://kovan.infura.io/v3/{settings.get("Infura")}'})
-                w3 = Web3(Web3.HTTPProvider(settings.get('Infura Link')))
-                settings.update({'Chain ID': 42})
-                chain_id = settings.get('Chain ID')
-            if settings['Rinkeby'] == 'down':
-                self.ids.Rinkeby.state = 'down'
-                self.ids.active_network.text = 'Rinkeby'
-                self.ids.network_active_sc.text = 'Rinkeby'
-                settings.update({'Network': 'rinkeby'})
-                settings.update({'Infura Link': f'https://rinkeby.infura.io/v3/{settings.get("Infura")}'})
-                w3 = Web3(Web3.HTTPProvider(settings.get('Infura Link')))
-                settings.update({'Chain ID': 4})
-                chain_id = settings.get('Chain ID')
-            if settings['Ropsten'] == 'down':
-                self.ids.Ropsten.state = 'down'
-                self.ids.active_network.text = 'Ropsten'
-                self.ids.network_active_sc.text = 'Ropsten'
-                settings.update({'Network': 'ropsten'})
-                settings.update({'Infura Link': f'https://ropsten.infura.io/v3/{settings.get("Infura")}'})
-                w3 = Web3(Web3.HTTPProvider(settings.get('Infura Link')))
-                settings.update({'Chain ID': 3})
-                chain_id = settings.get('Chain ID')
-            if settings['Ganache'] == 'down':
+            else:
                 self.ids.Ganache.state = 'down'
                 self.ids.active_network.text = 'Ganache'
                 self.ids.network_active_sc.text = 'Ganache'
-                settings.update({'Network': 'ganache'})
+                ganache_rpc = settings.get('Ganache RPC')
+                w3 = Web3(Web3.HTTPProvider(ganache_rpc))
+
         except AssertionError as e:
             self.ids.StatusBar.text = str(e)
         except ValueError as e:
@@ -220,7 +179,6 @@ class MyLayout(TabbedPanel):
         self.ids.GasEnter.text = settings['Gas Limit']
         self.ids.GanacheRPCEnter.text = settings['Ganache RPC']
         self.ids.GanacheIDEnter.text = settings['Ganache ID']
-        self.ids.SolidityCompiler.text = settings['Solidity Compiler']
         self.ids.GanacheAddressEnter.text = settings['Ganache Address']
         self.ids.GanachePrivateKeyEnter.text = settings['Ganache Private Key']
         self.ids.Address1.state = 'down'
@@ -240,7 +198,7 @@ class MyLayout(TabbedPanel):
         self.ids.last_usd_spent_sc.text = '0'
         self.address_cutting()
         # Install solidity compiler
-        install_solc(f'{self.ids.SolidityCompiler.text}')
+        install_solc(f'{settings.get("Solidity Compiler")}')
 
     # ################################################-Tab 3-################################################
     # Settings Confirmation
@@ -251,7 +209,7 @@ class MyLayout(TabbedPanel):
             self.ids.AddressEnter.text = self.ids.AddressEnter.text.strip()
             self.address_cutting()
             for x in range(1, 7):
-                if settings.get(f'Address {x}_State') == 'down':
+                if self.ids[f'Address{x}'].state == 'down':
                     settings.update({f'Address {x}': f'{self.ids.AddressEnter.text}'})
             with open('settings.json', 'w') as f:
                 data = json.dumps(settings, indent=1)
@@ -265,7 +223,7 @@ class MyLayout(TabbedPanel):
             self.ids.PrivateKeyEnter.text = self.ids.PrivateKeyEnter.text.strip()
 
             for x in range(1, 7):
-                if settings.get(f'Address {x}_State') == 'down':
+                if self.ids[f'Address{x}'].state == 'down':
                     settings.update({f'Private Key {x}': f'{self.ids.PrivateKeyEnter.text}'})
             with open('settings.json', 'w') as f:
                 data = json.dumps(settings, indent=1)
@@ -339,17 +297,6 @@ class MyLayout(TabbedPanel):
                 self.ids.GanacheIDEnter.text = 'Error'
             print('Saved')
 
-    def solidity_compiler_enter(self, state):
-        global data, f
-        if state is False:
-            settings.update({'Solidity Compiler': f'{self.ids.SolidityCompiler.text}'})
-            self.ids.SolidityCompiler.text = self.ids.SolidityCompiler.text.strip()
-            install_solc(f'{self.ids.SolidityCompiler.text}')
-            with open('settings.json', 'w') as f:
-                data = json.dumps(settings, indent=1)
-                f.write(data)
-            print('Saved')
-
     def ganache_address_enter(self, state):
         global data, f
         if state is False:
@@ -371,365 +318,76 @@ class MyLayout(TabbedPanel):
             print('Saved')
 
     #Active address selection
-    def address_1(self):
+    def address_selection(self, address, privatekey):
         global settings
-        if self.ids.Address1.state == 'down':
-            settings.update({'Address 1_State': 'down'})
-            settings.update({'Address 2_State': 'normal'})
-            settings.update({'Address 3_State': 'normal'})
-            settings.update({'Address 4_State': 'normal'})
-            settings.update({'Address 5_State': 'normal'})
-            settings.update({'Address 6_State': 'normal'})
-            self.ids.Address2.state = 'normal'
-            self.ids.Address3.state = 'normal'
-            self.ids.Address4.state = 'normal'
-            self.ids.Address5.state = 'normal'
-            self.ids.Address6.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 1')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 1')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
-
-    def address_2(self):
-        global settings
-        if self.ids.Address2.state == 'down':
-            settings.update({'Address 1_State': 'normal'})
-            settings.update({'Address 2_State': 'down'})
-            settings.update({'Address 3_State': 'normal'})
-            settings.update({'Address 4_State': 'normal'})
-            settings.update({'Address 5_State': 'normal'})
-            settings.update({'Address 6_State': 'normal'})
-            self.ids.Address1.state = 'normal'
-            self.ids.Address3.state = 'normal'
-            self.ids.Address4.state = 'normal'
-            self.ids.Address5.state = 'normal'
-            self.ids.Address6.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 2')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 2')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
-
-    def address_3(self):
-        global settings
-        if self.ids.Address3.state == 'down':
-            settings.update({'Address 1_State': 'normal'})
-            settings.update({'Address 2_State': 'normal'})
-            settings.update({'Address 3_State': 'down'})
-            settings.update({'Address 4_State': 'normal'})
-            settings.update({'Address 5_State': 'normal'})
-            settings.update({'Address 6_State': 'normal'})
-            self.ids.Address2.state = 'normal'
-            self.ids.Address1.state = 'normal'
-            self.ids.Address4.state = 'normal'
-            self.ids.Address5.state = 'normal'
-            self.ids.Address6.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 3')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 3')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
-
-    def address_4(self):
-        global settings
-        if self.ids.Address4.state == 'down':
-            settings.update({'Address 1_State': 'normal'})
-            settings.update({'Address 2_State': 'normal'})
-            settings.update({'Address 3_State': 'normal'})
-            settings.update({'Address 4_State': 'down'})
-            settings.update({'Address 5_State': 'normal'})
-            settings.update({'Address 6_State': 'normal'})
-            self.ids.Address2.state = 'normal'
-            self.ids.Address3.state = 'normal'
-            self.ids.Address1.state = 'normal'
-            self.ids.Address5.state = 'normal'
-            self.ids.Address6.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 4')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 4')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
-
-    def address_5(self):
-        global settings
-        if self.ids.Address5.state == 'down':
-            settings.update({'Address 1_State': 'normal'})
-            settings.update({'Address 2_State': 'normal'})
-            settings.update({'Address 3_State': 'normal'})
-            settings.update({'Address 4_State': 'normal'})
-            settings.update({'Address 5_State': 'down'})
-            settings.update({'Address 6_State': 'normal'})
-            self.ids.Address2.state = 'normal'
-            self.ids.Address3.state = 'normal'
-            self.ids.Address4.state = 'normal'
-            self.ids.Address1.state = 'normal'
-            self.ids.Address6.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 5')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 5')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
-
-    def address_6(self):
-        global settings
-        if self.ids.Address6.state == 'down':
-            settings.update({'Address 1_State': 'normal'})
-            settings.update({'Address 2_State': 'normal'})
-            settings.update({'Address 3_State': 'normal'})
-            settings.update({'Address 4_State': 'normal'})
-            settings.update({'Address 5_State': 'normal'})
-            settings.update({'Address 6_State': 'down'})
-            self.ids.Address2.state = 'normal'
-            self.ids.Address3.state = 'normal'
-            self.ids.Address4.state = 'normal'
-            self.ids.Address5.state = 'normal'
-            self.ids.Address1.state = 'normal'
-            self.ids.AddressEnter.text = settings.get('Address 6')
-            self.ids.PrivateKeyEnter.text = settings.get('Private Key 6')
-            settings.update({'Address': f'{self.ids.AddressEnter.text}'})
-            settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
-            self.address_cutting()
-            self.update_prices()
+        self.ids.AddressEnter.text = settings.get(f'{address}')
+        self.ids.PrivateKeyEnter.text = settings.get(f'{privatekey}')
+        settings.update({'Address': f'{self.ids.AddressEnter.text}'})
+        settings.update({'Private Key': f'{self.ids.PrivateKeyEnter.text}'})
+        self.address_cutting()
+        self.update_prices()
 
     # Network selection
-    def mainnet_network(self):
-        global data, f, network, ethsc, w3, chain_id, balance, settings, infura
+    def network_selection(self, selection, chainid):
+        global data, f, network, ethsc, w3, chain_id, balance, settings, infura, API
         try:
-            if self.ids.Mainnet.state == 'down':
-                settings.update({'Mainnet': 'down'})
-                settings.update({'Kovan': 'normal'})
-                settings.update({'Goerli': 'normal'})
-                settings.update({'Rinkeby': 'normal'})
-                settings.update({'Ropsten': 'normal'})
-                settings.update({'Ganache': 'normal'})
-                self.ids.Goerli.state = 'normal'
-                self.ids.Kovan.state = 'normal'
-                self.ids.Rinkeby.state = 'normal'
-                self.ids.Ropsten.state = 'normal'
-                self.ids.Ganache.state = 'normal'
-                self.ids.active_network.text = 'Mainnet'
-                self.ids.network_active_sc.text = 'Mainnet'
-                settings.update({'Infura Link': f'https://mainnet.infura.io/v3/{settings.get("Infura")}'})
-                settings.update({'Network': 'main'})
-                network = settings.get("Network")
-                ethsc = Etherscan(API, net=network)
+            print(f'selection: {selection}')
+            print(f'chainid: {chainid}')
+            network = selection
+            print(f'Network: {settings.get("Network")}')
+
+            if selection == 'mainnet':
+                settings.update({'Network': f'{selection}'})
+                ethsc = Etherscan(API, net='main')
+                settings.update({'Infura Link': f'https://{selection}.infura.io/v3/{settings.get("Infura")}'})
                 infura = settings.get('Infura Link')
                 w3 = Web3(Web3.HTTPProvider(infura))
-                settings.update({'Chain ID': 1})
+                settings.update({'Chain ID': chainid})
                 chain_id = settings.get('Chain ID')
                 balance = w3.eth.getBalance(f'{settings.get("Address")}')
                 balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
                 balance = round(float(balance), 5)
                 self.ids.Wallet_Balance.text = str(f'{balance} ETH')
-        except AssertionError as e:
-            self.ids.StatusBar.text = str(e)
-            self.ids.ETH_Price.text = 'N/A'
-            self.ids.Gas_Price.text = 'N/A'
-            self.ids.Gas_Price_USD.text = 'N/A'
-            self.ids.Conf_Time.text = 'N/A'
-        except requests.exceptions.ConnectionError:
-            pass
-        with open('settings.json', 'w') as f:
-            data = json.dumps(settings, indent=1)
-            f.write(data)
-
-    def goerli_network(self):
-        global data, f, network, ethsc, w3, chain_id, balance, settings, infura
-        try:
-            if self.ids.Goerli.state == 'down':
-                settings.update({'Goerli': 'down'})
-                settings.update({'Mainnet': 'normal'})
-                settings.update({'Kovan': 'normal'})
-                settings.update({'Rinkeby': 'normal'})
-                settings.update({'Ropsten': 'normal'})
-                settings.update({'Ganache': 'normal'})
-                self.ids.Mainnet.state = 'normal'
-                self.ids.Kovan.state = 'normal'
-                self.ids.Rinkeby.state = 'normal'
-                self.ids.Ropsten.state = 'normal'
-                self.ids.Ganache.state = 'normal'
-                self.ids.active_network.text = 'Goerli'
-                self.ids.network_active_sc.text = 'Goerli'
-                settings.update({'Infura Link': f'https://goerli.infura.io/v3/{settings.get("Infura")}'})
-                settings.update({'Network': 'goerli'})
-                network = settings.get("Network")
-                ethsc = Etherscan(API, net=network)
-                infura = settings.get('Infura Link')
-                w3 = Web3(Web3.HTTPProvider(infura))
-                settings.update({'Chain ID': 5})
-                chain_id = settings.get('Chain ID')
-                balance = w3.eth.getBalance(f'{settings.get("Address")}')
-                balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
-                balance = round(float(balance), 5)
-                self.ids.Wallet_Balance.text = str(f'{balance} ETH')
-        except AssertionError as e:
-            self.ids.StatusBar.text = str(e)
-            self.ids.ETH_Price.text = 'N/A'
-            self.ids.Gas_Price.text = 'N/A'
-            self.ids.Gas_Price_USD.text = 'N/A'
-            self.ids.Conf_Time.text = 'N/A'
-        except requests.exceptions.ConnectionError:
-            pass
-        with open('settings.json', 'w') as f:
-            data = json.dumps(settings, indent=1)
-            f.write(data)
-
-    def kovan_network(self):
-        global data, f, network, ethsc, w3, chain_id, balance, settings, infura
-        try:
-            if self.ids.Kovan.state == 'down':
-                settings.update({'Kovan': 'down'})
-                settings.update({'Mainnet': 'normal'})
-                settings.update({'Goerli': 'normal'})
-                settings.update({'Rinkeby': 'normal'})
-                settings.update({'Ropsten': 'normal'})
-                settings.update({'Ganache': 'normal'})
-                self.ids.Mainnet.state = 'normal'
-                self.ids.Goerli.state = 'normal'
-                self.ids.Rinkeby.state = 'normal'
-                self.ids.Ropsten.state = 'normal'
-                self.ids.Ganache.state = 'normal'
-                self.ids.active_network.text = 'Kovan'
-                self.ids.network_active_sc.text = 'Kovan'
-                settings.update({'Infura Link': f'https://kovan.infura.io/v3/{settings.get("Infura")}'})
-                settings.update({'Network': 'kovan'})
-                network = settings.get("Network")
-                ethsc = Etherscan(API, net=network)
-                infura = settings.get('Infura Link')
-                w3 = Web3(Web3.HTTPProvider(infura))
-                settings.update({'Chain ID': 42})
-                chain_id = settings.get('Chain ID')
-                balance = w3.eth.getBalance(f'{settings.get("Address")}')
-                balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
-                balance = round(float(balance), 5)
-                self.ids.Wallet_Balance.text = str(f'{balance} ETH')
-        except AssertionError as e:
-            self.ids.StatusBar.text = str(e)
-            self.ids.ETH_Price.text = 'N/A'
-            self.ids.Gas_Price.text = 'N/A'
-            self.ids.Gas_Price_USD.text = 'N/A'
-            self.ids.Conf_Time.text = 'N/A'
-        except requests.exceptions.ConnectionError:
-            pass
-        with open('settings.json', 'w') as f:
-            data = json.dumps(settings, indent=1)
-            f.write(data)
-
-    def rinkeby_network(self):
-        global data, f, network, ethsc, w3, chain_id, balance, settings, infura
-        try:
-            if self.ids.Rinkeby.state == 'down':
-                settings.update({'Rinkeby': 'down'})
-                settings.update({'Mainnet': 'normal'})
-                settings.update({'Kovan': 'normal'})
-                settings.update({'Goerli': 'normal'})
-                settings.update({'Ropsten': 'normal'})
-                settings.update({'Ganache': 'normal'})
-                self.ids.Mainnet.state = 'normal'
-                self.ids.Kovan.state = 'normal'
-                self.ids.Goerli.state = 'normal'
-                self.ids.Ropsten.state = 'normal'
-                self.ids.Ganache.state = 'normal'
-                self.ids.active_network.text = 'Rinkeby'
-                self.ids.network_active_sc.text = 'Rinkeby'
-                settings.update({'Infura Link': f'https://rinkeby.infura.io/v3/{settings.get("Infura")}'})
-                settings.update({'Network': 'rinkeby'})
-                network = settings.get("Network")
-                ethsc = Etherscan(API, net=network)
-                infura = settings.get('Infura Link')
-                w3 = Web3(Web3.HTTPProvider(infura))
-                settings.update({'Chain ID': 4})
-                chain_id = settings.get('Chain ID')
-                balance = w3.eth.getBalance(f'{settings.get("Address")}')
-                balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
-                balance = round(float(balance), 5)
-                self.ids.Wallet_Balance.text = str(f'{balance} ETH')
-        except AssertionError as e:
-            self.ids.StatusBar.text = str(e)
-            self.ids.ETH_Price.text = 'N/A'
-            self.ids.Gas_Price.text = 'N/A'
-            self.ids.Gas_Price_USD.text = 'N/A'
-            self.ids.Conf_Time.text = 'N/A'
-        except requests.exceptions.ConnectionError:
-            pass
-        with open('settings.json', 'w') as f:
-            data = json.dumps(settings, indent=1)
-            f.write(data)
-
-    def ropsten_network(self):
-        global data, f, network, ethsc, w3, chain_id, balance, settings, infura
-        try:
-            if self.ids.Ropsten.state == 'down':
-                settings.update({'Ropsten': 'down'})
-                settings.update({'Mainnet': 'normal'})
-                settings.update({'Kovan': 'normal'})
-                settings.update({'Rinkeby': 'normal'})
-                settings.update({'Ganache': 'normal'})
-                self.ids.Mainnet.state = 'normal'
-                self.ids.Kovan.state = 'normal'
-                self.ids.Rinkeby.state = 'normal'
-                self.ids.Ganache.state = 'normal'
-                self.ids.active_network.text = 'Ropsten'
-                self.ids.network_active_sc.text = 'Ropsten'
-                settings.update({'Infura Link': f'https://ropsten.infura.io/v3/{settings.get("Infura")}'})
-                settings.update({'Network': 'ropsten'})
-                network = settings.get("Network")
-                ethsc = Etherscan(API, net=network)
-                infura = settings.get('Infura Link')
-                w3 = Web3(Web3.HTTPProvider(infura))
-                settings.update({'Chain ID': 3})
-                chain_id = settings.get('Chain ID')
-                balance = w3.eth.getBalance(f'{settings.get("Address")}')
-                balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
-                balance = round(float(balance), 5)
-                self.ids.Wallet_Balance.text = str(f'{balance} ETH')
-        except AssertionError as e:
-            self.ids.StatusBar.text = str(e)
-            self.ids.ETH_Price.text = 'N/A'
-            self.ids.Gas_Price.text = 'N/A'
-            self.ids.Gas_Price_USD.text = 'N/A'
-            self.ids.Conf_Time.text = 'N/A'
-        except requests.exceptions.ConnectionError:
-            pass
-        with open('settings.json', 'w') as f:
-            data = json.dumps(settings, indent=1)
-            f.write(data)
-
-    def ganache_network(self):
-        global data, f, w3, settings
-        try:
-            if self.ids.Ganache.state == 'down':
-                settings.update({'Ganache': 'down'})
-                settings.update({'Mainnet': 'normal'})
-                settings.update({'Kovan': 'normal'})
-                settings.update({'Rinkeby': 'normal'})
-                settings.update({'Ropsten': 'normal'})
-                settings.update({'Goerli': 'normal'})
-                self.ids.Mainnet.state = 'normal'
-                self.ids.Kovan.state = 'normal'
-                self.ids.Rinkeby.state = 'normal'
-                self.ids.Ropsten.state = 'normal'
-                self.ids.Goerli.state = 'normal'
-                self.ids.active_network.text = 'Ganache'
-                self.ids.network_active_sc.text = 'Ganache'
+                self.ids.wallet_balance_sc.text = str(f'{balance} ETH')
+                self.address_cutting()
+            elif selection == 'ganache':
                 settings.update({'Network': 'ganache'})
+                self.update_prices()
                 ganache_rpc = settings.get('Ganache RPC')
+
                 w3 = Web3(Web3.HTTPProvider(ganache_rpc))
                 w3_balance = w3.eth.getBalance(settings.get('Ganache Address'))
                 w3_balance = f'{str(eval(f"{w3_balance}*0.000000000000000001"))}'
-                w3_balance = round(float(w3_balance), 4)
+                w3_balance = round(float(w3_balance), 5)
                 self.ids.Wallet_Balance.text = str(f'{w3_balance} ETH')
-        except web3.exceptions.InvalidAddress as e:
-            self.ids.StatusBar.text = str(e)
+                self.ids.Wallet_Balance.text = str(f'{w3_balance} ETH')
+                self.ids.wallet_balance_sc.text = str(f'{w3_balance} ETH')
+                self.address_cutting()
+            else:
+                settings.update({'Network': f'{selection}'})
+                self.update_prices()
+                ethsc = Etherscan(API, net=network)
+                settings.update({'Infura Link': f'https://{selection}.infura.io/v3/{settings.get("Infura")}'})
+                infura = settings.get('Infura Link')
+                w3 = Web3(Web3.HTTPProvider(infura))
+                settings.update({'Chain ID': chainid})
+                chain_id = settings.get('Chain ID')
+                balance = w3.eth.getBalance(f'{settings.get("Address")}')
+                balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
+                balance = round(float(balance), 5)
+                print(f'Balance: {balance}')
+                self.ids.Wallet_Balance.text = str(f'{balance} ETH')
+                self.ids.wallet_balance_sc.text = str(f'{balance} ETH')
+                self.address_cutting()
+                print('Checkpoint')
+
+            self.ids.active_network.text = selection.title()
+            self.ids.network_active_sc.text = selection.title()
+            print(f'infura link: {settings.get("Infura Link")}')
         except AssertionError as e:
             self.ids.StatusBar.text = str(e)
             self.ids.ETH_Price.text = 'N/A'
+            self.ids.eth_price_sc.text = 'N/A'
             self.ids.Gas_Price.text = 'N/A'
             self.ids.Gas_Price_USD.text = 'N/A'
             self.ids.Conf_Time.text = 'N/A'
@@ -780,7 +438,7 @@ class MyLayout(TabbedPanel):
                 w3_balance = f'{str(eval(f"{w3_balance}*0.000000000000000001"))}'
                 w3_balance = round(float(w3_balance), 4)
                 self.ids.Wallet_Balance.text = str(f'{w3_balance} ETH')
-                self.ids.wallet_balance_sc.text = str(f'{balance} ETH')
+                self.ids.wallet_balance_sc.text = str(f'{w3_balance} ETH')
             else:
                 balance = w3.eth.getBalance(f'{settings.get("Address")}')
                 balance = f'{str(eval(f"{balance}*0.000000000000000001"))}'
@@ -1117,6 +775,16 @@ class MyLayout(TabbedPanel):
         except ValueError as e:
             self.ids.StatusBar.text = str(e)
 
+    def set_compiler(self, state, compiler, version):
+        global settings, f, data
+        self.ids.compiler_set.text = compiler
+        settings.update({'Solidity Compiler': f'{version}'})
+        settings.update({'Full Compiler': f'{compiler}'})
+
+        with open('settings.json', 'w') as f:
+            data = json.dumps(settings, indent=1)
+            f.write(data)
+
     # ################################################-Tab 1-################################################
     def activate_uploaded_sc(self):
         global settings, ethsc, API, network, contract_address, contract_abi, iterator, x, view_mutability, \
@@ -1311,7 +979,6 @@ class MyLayout(TabbedPanel):
         self.ids.ExternalSC.disabled = True
 
         # view functions
-
     def view_function_execution(self, text, *args):
         global iterator, view_mutability, uploaded_sc, input_name, view_outputs, view_inputs, distinguish
 
@@ -1756,7 +1423,12 @@ class MyLayout(TabbedPanel):
     def address_cutting(self):
         global settings, short_address
 
-        short_address = settings.get('Address')
+        if settings.get('Network') != 'ganache':
+            short_address = settings.get('Address')
+
+        else:
+            short_address = settings.get('Ganache Address')
+
         short_address = short_address[:11]
         short_address = short_address + '...'
         self.ids.address_active.text = short_address
@@ -1817,7 +1489,8 @@ class MyLayout(TabbedPanel):
             data = json.dumps(settings, indent=1)
             f.write(data)
 
-    def test_focus(self, instance):
+    @staticmethod
+    def test_focus(instance):
         if instance:
             print(f'Clicked on {instance}')
         else:
@@ -1847,6 +1520,7 @@ class ConstructorText(ClickInput):
 
 class ContractInput(ClickInput):
     pass
+
 
 class SubContractButton(ToggleButton):
     pass
@@ -1878,6 +1552,7 @@ class Input(TextInput):
 
 class SmartContractOperationsApp(App):
     def build(self):
+        self.popup_window = MyLayout()
         Window.clearcolor = (1, 166 / 255, 77 / 255, 1)
         return MyLayout()
 
