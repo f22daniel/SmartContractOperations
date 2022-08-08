@@ -1,4 +1,5 @@
-#:import Factory kivy.factory.Factory
+#: import Factory kivy.factory.Factory
+#: include SC_App_Popup.kv
 
 <TabbedPanelItem>
     markup: True
@@ -202,7 +203,6 @@
                     text: ''
                     id: ContractAddress
                     size_hint: 0.6, 1
-                    on_focus: root.test_focus(self.focus)
             # Commands line
             BoxLayout:
                 orientation: 'horizontal'
@@ -491,9 +491,11 @@
                 LabelDescription:
                     size_hint: .7, 1
                     text: 'ETH Price'
-                LabelDescription:
+                Button:
                     size_hint: .9, 1
                     text: 'Network Active'
+                    id: network_switch
+                    on_release: Factory.NetworkPopup().open()
                 LabelDescription:
                     size_hint: 1, 1
                     text: 'Address Active'
@@ -559,20 +561,21 @@
                 padding: 5
                 orientation: 'tb-lr'
                 size_hint: 1, .2
-                LabelDescription:
-                    text: 'Compiler set'
-                    size_hint: 1.1, 1
+                Button:
+                    text: 'Set Compiler'
+                    size_hint: 1.5, 1
+                    on_release: Factory.MyPopup().open()
                 LabelValue:
                     id: compiler_set
                     text: ''
-                    size_hint: 1.1, 1
+                    size_hint: 1.5, 1
                 LabelDescription:
                     text: 'Total Gas used'
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelValue:
                     id: total_gas_used
                     text: ''
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelDescription:
                     text: 'Total Gwei spent'
                     size_hint: 1, 1
@@ -582,32 +585,32 @@
                     size_hint: 1, 1
                 LabelDescription:
                     text: 'Total USD spent'
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelValue:
                     id: total_usd_spent
                     text: ''
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelDescription:
                     text: 'Last Gas spent'
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelValue:
                     id: last_gas_spent
                     text: ''
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelDescription:
                     text: 'Last Gwei spent'
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelValue:
                     id: last_gwei_spent
                     text: ''
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelDescription:
                     text: 'Last USD spent'
-                    size_hint: .9, 1
+                    size_hint: 1, 1
                 LabelValue:
                     id: last_usd_spent
                     text: ''
-                    size_hint: .9, 1
+                    size_hint: 1, 1
 
             LabelDescription:
                 font_size: 16
@@ -774,7 +777,7 @@
             GridLayout:
                 spacing: 5
                 padding: 5
-                rows: 10
+                rows: 9
                 cols:2
                 # Background color in Tab
                 canvas:
@@ -855,14 +858,6 @@
                     id: GanacheIDEnter
                     text: ''
                     on_focus: root.ganache_id_enter(self.focus)
-                # Solidity Compiler
-                LabelDescription:
-                    text: 'Solidity Compiler'
-                    size_hint: 0.2, 1
-                TextInput:
-                    id: SolidityCompiler
-                    text: ''
-                    on_focus: root.solidity_compiler_enter(self.focus)
             GridLayout:
                 spacing: 5
                 padding: 5
@@ -882,53 +877,65 @@
                     size_hint: 1.8, 1
                 ToggleButton:
                     id: Address1
+                    group: 'Address'
                     text: 'Address 1'
-                    on_state: root.address_1()
+                    on_press: root.address_selection('Address 1', 'Private Key 1')
                 ToggleButton:
                     id: Address2
+                    group: 'Address'
                     text: 'Address 2'
-                    on_state: root.address_2()
+                    on_press: root.address_selection('Address 2', 'Private Key 2')
                 ToggleButton:
                     id: Address3
+                    group: 'Address'
                     text: 'Address 3'
-                    on_state: root.address_3()
+                    on_press: root.address_selection('Address 3', 'Private Key 3')
                 ToggleButton:
                     id: Address4
+                    group: 'Address'
                     text: 'Address 4'
-                    on_state: root.address_4()
+                    on_press: root.address_selection('Address 4', 'Private Key 4')
                 ToggleButton:
                     id: Address5
+                    group: 'Address'
                     text: 'Address 5'
-                    on_state: root.address_5()
+                    on_press: root.address_selection('Address 5', 'Private Key 5')
                 ToggleButton:
                     id: Address6
+                    group: 'Address'
                     text: 'Address 6'
-                    on_state: root.address_6()
+                    on_press: root.address_selection('Address 6', 'Private Key 6')
                 # Network selection
                 LabelDescription:
                     text: 'Network selection'
                     size_hint: 1.8, 1
                 ToggleButton:
                     id: Mainnet
+                    group: 'Network'
                     text: 'Mainnet'
-                    on_state: root.mainnet_network()
+                    on_press: root.network_selection('mainnet', 1)
                 ToggleButton:
                     id: Goerli
                     text: 'Goerli'
-                    on_state: root.goerli_network()
+                    group: 'Network'
+                    on_press: root.network_selection('goerli', 5)
                 ToggleButton:
                     id: Kovan
                     text: 'Kovan'
-                    on_state: root.kovan_network()
+                    group: 'Network'
+                    on_press: root.network_selection('kovan', 42)
                 ToggleButton:
                     id: Rinkeby
                     text: 'Rinkeby'
-                    on_state: root.rinkeby_network()
+                    group: 'Network'
+                    on_press: root.network_selection('rinkeby', 4)
                 ToggleButton:
                     id: Ropsten
                     text: 'Ropsten'
-                    on_state: root.ropsten_network()
+                    group: 'Network'
+                    on_press: root.network_selection('ropsten', 3)
                 ToggleButton:
                     id: Ganache
                     text: 'Ganache'
-                    on_state: root.ganache_network()
+                    group: 'Network'
+                    on_press: root.network_selection('ganache', '')
