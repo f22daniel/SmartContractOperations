@@ -1,0 +1,582 @@
+#:import Factory kivy.factory.Factory
+
+<CompilerButton@ToggleButton>
+    markup: True
+    bold: True
+    font_size: 18
+    size_hint: 1, None
+    height: 30
+    group: 'compiler_version'
+    background_normal: ''
+    background_color: (255/255, 204/255, 128/255 , 1)
+
+<NetworkButton@CompilerButton>
+    group: 'network_active'
+    size_hint: 1, 1
+
+<NetworkPopup@Popup>
+    auto_dismiss: True
+    markup: True
+    size_hint: 0.3, 0.7
+    pos_hint: {'center': 0, 'top': .8}
+    title: 'Select Network'
+    valign: 'middle'
+    BoxLayout:
+        size: root.width, root.height
+        orientation: 'vertical'
+        spacing: 3
+        padding: 3
+        NetworkButton:
+            id: Mainnet
+            text: 'Mainnet'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Mainnet.text, 1)
+        NetworkButton:
+            id: Goerli
+            text: 'Goerli'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Goerli.text, 5)
+        NetworkButton:
+            id: Kovan
+            text: 'Kovan'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Kovan.text, 42)
+        NetworkButton:
+            id: Rinkeby
+            text: 'Rinkeby'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Rinkeby.text, 4)
+        NetworkButton:
+            id: Ropsten
+            text: 'Ropsten'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Ropsten.text, 3)
+        NetworkButton:
+            id: Ganache
+            text: 'Ganache'
+            on_press:
+                app.root.ids.active_network.text = self.text
+                app.popup_window.network_selection(Ganache.text, '')
+
+
+<MyPopup@Popup>
+    auto_dismiss: True
+    markup: True
+    size_hint: 0.3, 0.7
+    pos_hint: {'center': 0, 'top': .8}
+    title: 'Set Compiler'
+    valign: 'middle'
+    canvas.before:
+        Color:
+            rgba: (1, 166 / 255, 77 / 255, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        size: root.width, root.height
+        orientation: 'vertical'
+        Label:
+            id: popup_label
+            size_hint: 1, .1
+            text: ''
+            font_size: 20
+            bold: True
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            GridLayout:
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: 2.5
+                padding: 2.5
+                orientation: 'lr-tb'
+                cols: 1
+                rows: 70
+                CompilerButton:
+                    id: v0_8_15
+                    text: 'v0.8.15+commit.e14f2714'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_15.text
+                        app.root.ids.compiler_set.text = v0_8_15.text
+                        app.popup_window.set_compiler(self.state, v0_8_15.text, '0.8.15')
+                CompilerButton:
+                    id: v0_8_14
+                    text: 'v0.8.14+commit.80d49f37'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_14.text
+                        app.root.ids.compiler_set.text = v0_8_14.text
+                        app.popup_window.set_compiler(self.state, v0_8_14.text, '0.8.14')
+                CompilerButton:
+                    id: v0_8_13
+                    text: 'v0.8.13+commit.abaa5c0e'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_13.text
+                        app.root.ids.compiler_set.text = v0_8_13.text
+                        app.popup_window.set_compiler(self.state, v0_8_13.text, '0.8.13')
+                CompilerButton:
+                    id: v0_8_12
+                    text: 'v0.8.12+commit.f00d7308'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_12.text
+                        app.root.ids.compiler_set.text = v0_8_12.text
+                        app.popup_window.set_compiler(self.state, v0_8_12.text, '0.8.12')
+                CompilerButton:
+                    id: v0_8_11
+                    text: 'v0.8.11+commit.d7f03943'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_11.text
+                        app.root.ids.compiler_set.text = v0_8_11.text
+                        app.popup_window.set_compiler(self.state, v0_8_11.text, '0.8.11')
+                CompilerButton:
+                    id: v0_8_10
+                    text: 'v0.8.10+commit.fc410830'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_10.text
+                        app.root.ids.compiler_set.text = v0_8_10.text
+                        app.popup_window.set_compiler(self.state, v0_8_10.text, '0.8.10')
+                CompilerButton:
+                    id: v0_8_9
+                    text: 'v0.8.9+commit.e5eed63a'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_9.text
+                        app.root.ids.compiler_set.text = v0_8_9.text
+                        app.popup_window.set_compiler(self.state, v0_8_9.text, '0.8.9')
+                CompilerButton:
+                    id: v0_8_8
+                    text: 'v0.8.8+commit.dddeac2f'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_8.text
+                        app.root.ids.compiler_set.text = v0_8_8.text
+                        app.popup_window.set_compiler(self.state, v0_8_8.text, '0.8.8')
+                CompilerButton:
+                    id: v0_8_7
+                    text: 'v0.8.7+commit.e28d00a7'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_7.text
+                        app.root.ids.compiler_set.text = v0_8_7.text
+                        app.popup_window.set_compiler(self.state, v0_8_7.text, '0.8.7')
+                CompilerButton:
+                    id: v0_8_6
+                    text: 'v0.8.6+commit.11564f7e'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_6.text
+                        app.root.ids.compiler_set.text = v0_8_6.text
+                        app.popup_window.set_compiler(self.state, v0_8_6.text, '0.8.6')
+                CompilerButton:
+                    id: v0_8_5
+                    text: 'v0.8.5+commit.a4f2e591'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_5.text
+                        app.root.ids.compiler_set.text = v0_8_5.text
+                        app.popup_window.set_compiler(self.state, v0_8_5.text, '0.8.5')
+                CompilerButton:
+                    id: v0_8_4
+                    text: 'v0.8.4+commit.c7e474f2'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_4.text
+                        app.root.ids.compiler_set.text = v0_8_4.text
+                        app.popup_window.set_compiler(self.state, v0_8_4.text, '0.8.4')
+                CompilerButton:
+                    id: v0_8_3
+                    text: 'v0.8.3+commit.8d00100c'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_3.text
+                        app.root.ids.compiler_set.text = v0_8_3.text
+                        app.popup_window.set_compiler(self.state, v0_8_3.text, '0.8.3')
+                CompilerButton:
+                    id: v0_8_2
+                    text: 'v0.8.2+commit.661d1103'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_2.text
+                        app.root.ids.compiler_set.text = v0_8_2.text
+                        app.popup_window.set_compiler(self.state, v0_8_2.text, '0.8.2')
+                CompilerButton:
+                    id: v0_8_1
+                    text: 'v0.8.1+commit.8d00100c'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_1.text
+                        app.root.ids.compiler_set.text = v0_8_1.text
+                        app.popup_window.set_compiler(self.state, v0_8_1.text, '0.8.1')
+                CompilerButton:
+                    id: v0_8_0
+                    text: 'v0.8.0+commit.661d1103'
+                    on_press:
+                        root.ids.popup_label.text = v0_8_0.text
+                        app.root.ids.compiler_set.text = v0_8_0.text
+                        app.popup_window.set_compiler(self.state, v0_8_0.text, '0.8.0')
+                CompilerButton:
+                    id: v0_7_6
+                    text: 'v0.7.6+commit.7338295f'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_6.text
+                        app.root.ids.compiler_set.text = v0_7_6.text
+                        app.popup_window.set_compiler(self.state, v0_7_6.text, '0.7.6')
+                CompilerButton:
+                    id: v0_7_5
+                    text: 'v0.7.5+commit.eb77ed08'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_5.text
+                        app.root.ids.compiler_set.text = v0_7_5.text
+                        app.popup_window.set_compiler(self.state, v0_7_5.text, '0.7.5')
+                CompilerButton:
+                    id: v0_7_4
+                    text: 'v0.7.4+commit.3f05b770'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_4.text
+                        app.root.ids.compiler_set.text = v0_7_4.text
+                        app.popup_window.set_compiler(self.state, v0_7_4.text, '0.7.4')
+                CompilerButton:
+                    id: v0_7_3
+                    text: 'v0.7.3+commit.9bfce1f6'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_3.text
+                        app.root.ids.compiler_set.text = v0_7_3.text
+                        app.popup_window.set_compiler(self.state, v0_7_3.text, '0.7.3')
+                CompilerButton:
+                    id: v0_7_2
+                    text: 'v0.7.2+commit.51b20bc0'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_2.text
+                        app.root.ids.compiler_set.text = v0_7_2.text
+                        app.popup_window.set_compiler(self.state, v0_7_2.text, '0.7.2')
+                CompilerButton:
+                    id: v0_7_1
+                    text: 'v0.7.1+commit.f4a555be'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_1.text
+                        app.root.ids.compiler_set.text = v0_7_1.text
+                        app.popup_window.set_compiler(self.state, v0_7_1.text, '0.7.1')
+                CompilerButton:
+                    id: v0_7_0
+                    text: 'v0.7.0+commit.9e61f92b'
+                    on_press:
+                        root.ids.popup_label.text = v0_7_0.text
+                        app.root.ids.compiler_set.text = v0_7_0.text
+                        app.popup_window.set_compiler(self.state, v0_7_0.text, '0.7.0')
+                CompilerButton:
+                    id: v0_6_12
+                    text: 'v0.6.12+commit.27d51765'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_12.text
+                        app.root.ids.compiler_set.text = v0_6_12.text
+                        app.popup_window.set_compiler(self.state, v0_6_12.text, '0.6.12')
+                CompilerButton:
+                    id: v0_6_11
+                    text: 'v0.6.11+commit.5ef660b1'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_11.text
+                        app.root.ids.compiler_set.text = v0_6_11.text
+                        app.popup_window.set_compiler(self.state, v0_6_11.text, '0.6.11')
+                CompilerButton:
+                    id: v0_6_10
+                    text: 'v0.6.10+commit.00c0fcaf'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_10.text
+                        app.root.ids.compiler_set.text = v0_6_10.text
+                        app.popup_window.set_compiler(self.state, v0_6_10.text, '0.6.10')
+                CompilerButton:
+                    id: v0_6_9
+                    text: 'v0.6.9+commit.3e3065ac'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_9.text
+                        app.root.ids.compiler_set.text = v0_6_9.text
+                        app.popup_window.set_compiler(self.state, v0_6_9.text, '0.6.9')
+                CompilerButton:
+                    id: v0_6_8
+                    text: 'v0.6.8+commit.0bbfe453'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_8.text
+                        app.root.ids.compiler_set.text = v0_6_8.text
+                        app.popup_window.set_compiler(self.state, v0_6_8.text, '0.6.8')
+                CompilerButton:
+                    id: v0_6_7
+                    text: 'v0.6.7+commit.b8d736ae'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_7.text
+                        app.root.ids.compiler_set.text = v0_6_7.text
+                        app.popup_window.set_compiler(self.state, v0_6_7.text, '0.6.7')
+                CompilerButton:
+                    id: v0_6_6
+                    text: 'v0.6.6+commit.6c089d02'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_6.text
+                        app.root.ids.compiler_set.text = v0_6_6.text
+                        app.popup_window.set_compiler(self.state, v0_6_6.text, '0.6.6')
+                CompilerButton:
+                    id: v0_6_5
+                    text: 'v0.6.5+commit.f956cc89'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_5.text
+                        app.root.ids.compiler_set.text = v0_6_5.text
+                        app.popup_window.set_compiler(self.state, v0_6_5.text, '0.6.5')
+                CompilerButton:
+                    id: v0_6_4
+                    text: 'v0.6.4+commit.1dca32f3'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_4.text
+                        app.root.ids.compiler_set.text = v0_6_4.text
+                        app.popup_window.set_compiler(self.state, v0_6_4.text, '0.6.4')
+                CompilerButton:
+                    id: v0_6_3
+                    text: 'v0.6.3+commit.8dda9521'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_3.text
+                        app.root.ids.compiler_set.text = v0_6_3.text
+                        app.popup_window.set_compiler(self.state, v0_6_3.text, '0.6.3')
+                CompilerButton:
+                    id: v0_6_2
+                    text: 'v0.6.2+commit.bacdbe57'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_2.text
+                        app.root.ids.compiler_set.text = v0_6_2.text
+                        app.popup_window.set_compiler(self.state, v0_6_2.text, '0.6.2')
+                CompilerButton:
+                    id: v0_6_1
+                    text: 'v0.6.1+commit.e6f7d5a4'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_1.text
+                        app.root.ids.compiler_set.text = v0_6_1.text
+                        app.popup_window.set_compiler(self.state, v0_6_1.text, '0.6.1')
+                CompilerButton:
+                    id: v0_6_0
+                    text: 'v0.6.0+commit.26b70077'
+                    on_press:
+                        root.ids.popup_label.text = v0_6_0.text
+                        app.root.ids.compiler_set.text = v0_6_0.text
+                        app.popup_window.set_compiler(self.state, v0_6_0.text, '0.6.0')
+                CompilerButton:
+                    id: v0_5_17
+                    text: 'v0.5.17+commit.d19bba13'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_17.text
+                        app.root.ids.compiler_set.text = v0_5_17.text
+                        app.popup_window.set_compiler(self.state, v0_5_17.text, '0.5.17')
+                CompilerButton:
+                    id: v0_5_16
+                    text: 'v0.5.16+commit.9c3226ce'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_16.text
+                        app.root.ids.compiler_set.text = v0_5_16.text
+                        app.popup_window.set_compiler(self.state, v0_5_16.text, '0.5.16')
+                CompilerButton:
+                    id: v0_5_15
+                    text: 'v0.5.15+commit.6a57276f'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_15.text
+                        app.root.ids.compiler_set.text = v0_5_15.text
+                        app.popup_window.set_compiler(self.state, v0_5_15.text, '0.5.15')
+                CompilerButton:
+                    id: v0_5_14
+                    text: 'v0.5.14+commit.01f1aaa4'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_14.text
+                        app.root.ids.compiler_set.text = v0_5_14.text
+                        app.popup_window.set_compiler(self.state, v0_5_14.text, '0.5.14')
+                CompilerButton:
+                    id: v0_5_13
+                    text: 'v0.5.13+commit.5b0b510c'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_13.text
+                        app.root.ids.compiler_set.text = v0_5_13.text
+                        app.popup_window.set_compiler(self.state, v0_5_13.text, '0.5.13')
+                CompilerButton:
+                    id: v0_5_12
+                    text: 'v0.5.12+commit.7709ece9'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_12.text
+                        app.root.ids.compiler_set.text = v0_5_12.text
+                        app.popup_window.set_compiler(self.state, v0_5_12.text, '0.5.12')
+                CompilerButton:
+                    id: v0_5_11
+                    text: 'v0.5.11+commit.22be8592'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_11.text
+                        app.root.ids.compiler_set.text = v0_5_11.text
+                        app.popup_window.set_compiler(self.state, v0_5_11.text, '0.5.11')
+                CompilerButton:
+                    id: v0_5_10
+                    text: 'v0.5.10+commit.5a6ea5b1'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_10.text
+                        app.root.ids.compiler_set.text = v0_5_10.text
+                        app.popup_window.set_compiler(self.state, v0_5_10.text, '0.5.10')
+                CompilerButton:
+                    id: v0_5_9
+                    text: 'v0.5.9+commit.c68bc34e'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_9.text
+                        app.root.ids.compiler_set.text = v0_5_9.text
+                        app.popup_window.set_compiler(self.state, v0_5_9.text, '0.5.9')
+                CompilerButton:
+                    id: v0_5_8
+                    text: 'v0.5.8+commit.23d335f2'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_8.text
+                        app.root.ids.compiler_set.text = v0_5_8.text
+                        app.popup_window.set_compiler(self.state, v0_5_8.text, '0.5.8')
+                CompilerButton:
+                    id: v0_5_7
+                    text: 'v0.5.7+commit.6da8b019'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_7.text
+                        app.root.ids.compiler_set.text = v0_5_7.text
+                        app.popup_window.set_compiler(self.state, v0_5_7.text, '0.5.7')
+                CompilerButton:
+                    id: v0_5_6
+                    text: 'v0.5.6+commit.b259423e'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_6.text
+                        app.root.ids.compiler_set.text = v0_5_6.text
+                        app.popup_window.set_compiler(self.state, v0_5_6.text, '0.5.6')
+                CompilerButton:
+                    id: v0_5_5
+                    text: 'v0.5.5+commit.47a71e8f'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_5.text
+                        app.root.ids.compiler_set.text = v0_5_5.text
+                        app.popup_window.set_compiler(self.state, v0_5_5.text, '0.5.5')
+                CompilerButton:
+                    id: v0_5_4
+                    text: 'v0.5.4+commit.9549d8ff'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_4.text
+                        app.root.ids.compiler_set.text = v0_5_4.text
+                        app.popup_window.set_compiler(self.state, v0_5_4.text, '0.5.4')
+                CompilerButton:
+                    id: v0_5_3
+                    text: 'v0.5.3+commit.10d17f24'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_3.text
+                        app.root.ids.compiler_set.text = v0_5_3.text
+                        app.popup_window.set_compiler(self.state, v0_5_3.text, '0.5.3')
+                CompilerButton:
+                    id: v0_5_2
+                    text: 'v0.5.2+commit.1df8f40c'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_2.text
+                        app.root.ids.compiler_set.text = v0_5_2.text
+                        app.popup_window.set_compiler(self.state, v0_5_2.text, '0.5.2')
+                CompilerButton:
+                    id: v0_5_1
+                    text: 'v0.5.1+commit.c8a2cb62'
+                    on_press:
+                        root.ids.popup_label.text = v0_5_1.text
+                        app.root.ids.compiler_set.text = v0_5_1.text
+                        app.popup_window.set_compiler(self.state, v0_5_1.text, '0.5.1')
+                CompilerButton:
+                    id: v0_4_26
+                    text: 'v0.4.26+commit.4563c3fc'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_26.text
+                        app.root.ids.compiler_set.text = v0_4_26.text
+                        app.popup_window.set_compiler(self.state, v0_4_26.text, '0.4.26')
+                CompilerButton:
+                    id: v0_4_25
+                    text: 'v0.4.25+commit.59dbf8f1'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_25.text
+                        app.root.ids.compiler_set.text = v0_4_25.text
+                        app.popup_window.set_compiler(self.state, v0_4_25.text, '0.4.25')
+                CompilerButton:
+                    id: v0_4_24
+                    text: 'v0.4.24+commit.e67f0147'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_24.text
+                        app.root.ids.compiler_set.text = v0_4_24.text
+                        app.popup_window.set_compiler(self.state, v0_4_24.text, '0.4.24')
+                CompilerButton:
+                    id: v0_4_23
+                    text: 'v0.4.23+commit.124ca40d'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_23.text
+                        app.root.ids.compiler_set.text = v0_4_23.text
+                        app.popup_window.set_compiler(self.state, v0_4_23.text, '0.4.23')
+                CompilerButton:
+                    id: v0_4_22
+                    text: 'v0.4.22+commit.4cb486ee'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_22.text
+                        app.root.ids.compiler_set.text = v0_4_22.text
+                        app.popup_window.set_compiler(self.state, v0_4_22.text, '0.4.22')
+                CompilerButton:
+                    id: v0_4_21
+                    text: 'v0.4.21+commit.dfe3193c'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_21.text
+                        app.root.ids.compiler_set.text = v0_4_21.text
+                        app.popup_window.set_compiler(self.state, v0_4_21.text, '0.4.21')
+                CompilerButton:
+                    id: v0_4_20
+                    text: 'v0.4.20+commit.3155dd80'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_20.text
+                        app.root.ids.compiler_set.text = v0_4_20.text
+                        app.popup_window.set_compiler(self.state, v0_4_20.text, '0.4.20')
+                CompilerButton:
+                    id: v0_4_19
+                    text: 'v0.4.19+commit.c4cbbb05'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_19.text
+                        app.root.ids.compiler_set.text = v0_4_19.text
+                        app.popup_window.set_compiler(self.state, v0_4_19.text, '0.4.19')
+                CompilerButton:
+                    id: v0_4_18
+                    text: 'v0.4.18+commit.9cf6e910'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_18.text
+                        app.root.ids.compiler_set.text = v0_4_18.text
+                        app.popup_window.set_compiler(self.state, v0_4_18.text, '0.4.18')
+                CompilerButton:
+                    id: v0_4_17
+                    text: 'v0.4.17+commit.bdeb9e52'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_17.text
+                        app.root.ids.compiler_set.text = v0_4_17.text
+                        app.popup_window.set_compiler(self.state, v0_4_17.text, '0.4.17')
+                CompilerButton:
+                    id: v0_4_16
+                    text: 'v0.4.16+commit.d7661dd9'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_16.text
+                        app.root.ids.compiler_set.text = v0_4_16.text
+                        app.popup_window.set_compiler(self.state, v0_4_16.text, '0.4.16')
+                CompilerButton:
+                    id: v0_4_15
+                    text: 'v0.4.15+commit.bbb8e64f'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_15.text
+                        app.root.ids.compiler_set.text = v0_4_15.text
+                        app.popup_window.set_compiler(self.state, v0_4_15.text, '0.4.15')
+                CompilerButton:
+                    id: v0_4_14
+                    text: 'v0.4.14+commit.c2215d46'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_14.text
+                        app.root.ids.compiler_set.text = v0_4_14.text
+                        app.popup_window.set_compiler(self.state, v0_4_14.text, '0.4.14')
+                CompilerButton:
+                    id: v0_4_13
+                    text: 'v0.4.13+commit.0fb4cb1a'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_13.text
+                        app.root.ids.compiler_set.text = v0_4_13.text
+                        app.popup_window.set_compiler(self.state, v0_4_13.text, '0.4.13')
+                CompilerButton:
+                    id: v0_4_12
+                    text: 'v0.4.12+commit.194ff033'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_12.text
+                        app.root.ids.compiler_set.text = v0_4_12.text
+                        app.popup_window.set_compiler(self.state, v0_4_12.text, '0.4.12')
+                CompilerButton:
+                    id: v0_4_11
+                    text: 'v0.4.11+commit.68ef5810'
+                    on_press:
+                        root.ids.popup_label.text = v0_4_11.text
+                        app.root.ids.compiler_set.text = v0_4_11.text
+                        app.popup_window.set_compiler(self.state, v0_4_11.text, '0.4.11')
