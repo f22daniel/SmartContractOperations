@@ -1,6 +1,6 @@
 {
  "Address": "0x8Db1911d01D328321e72f636766Cc2cc176aa957",
- "Private Key": "0xf7f575648c04e9083c8f0b5a30261c474f323b7e8e9646924546d9d4ced3a1d7",
+ "Private Key": "",
  "API": "RC9TA84CDIRX3IDWPWPH7SKZAEP1M8YQIW",
  "BSC API": "",
  "Infura": "815e996eff9c4caa8cfe1349781148b6",
@@ -25,9 +25,9 @@
   "Address 6": ""
  },
  "Private Keys": {
-  "Private Key 1": "0xcb6cc428559b3e4e9462749f3b1195a105dd8a263315cba3a4e6b3d49681288e",
-  "Private Key 2": "0xf7f575648c04e9083c8f0b5a30261c474f323b7e8e9646924546d9d4ced3a1d7",
-  "Private Key 3": "0xb1f61b5fc798d3cbcdacdb83ceb364ac803a709f832e523eb32537cb737f492c",
+  "Private Key 1": "",
+  "Private Key 2": "",
+  "Private Key 3": "",
   "Private Key 4": "",
   "Private Key 5": "",
   "Private Key 6": ""
