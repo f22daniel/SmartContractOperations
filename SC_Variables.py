@@ -1,6 +1,5 @@
 import json
 
-
 class Settings:
 
     def __init__(self, json_path):
@@ -46,7 +45,7 @@ class Settings:
         self.total_usd_spent = data.get('Total USD spent')
         self.contract_web_page = data.get('Contract Web Page')
 
-    def update_json(self, json_path='/Users/f22daniel/PycharmProjects/Griraffe/smart_contract_development/Kivy_App/settings.json'):
+    def update_json(self, json_path='settings.json'):
         data = {'Address': self.address, 'Private Key': self.private_key, 'API': self.etherscan_api, 'BSC API': self.bsc_api,
                 'Infura': self.infura_api, 'Gas Limit': self.gas_limit, 'Ganache Address': self.ganache_address,
                 'Ganache ID': self.ganache_id, 'Infura Link': self.infura_link, 'Network': self.network, 'Contract Web Page': self.contract_web_page,
@@ -122,7 +121,7 @@ class Variables:
         self.subcontract = subcontract
 
 
-settings_test = Settings("/Users/f22daniel/PycharmProjects/Griraffe/smart_contract_development/Kivy_App/settings.json")
+settings_test = Settings("settings.json")
 variables_test = Variables()
 
 '''
