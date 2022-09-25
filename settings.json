@@ -1,0 +1,38 @@
+{
+ "Address": "0x8Db1911d01D328321e72f636766Cc2cc176aa957",
+ "Private Key": "0xf7f575648c04e9083c8f0b5a30261c474f323b7e8e9646924546d9d4ced3a1d7",
+ "API": "RC9TA84CDIRX3IDWPWPH7SKZAEP1M8YQIW",
+ "BSC API": "",
+ "Infura": "815e996eff9c4caa8cfe1349781148b6",
+ "Gas Limit": "",
+ "Ganache Address": "0x9B78FdEfA454113C348316327fA4FB3Beb9E1347",
+ "Ganache ID": 1337,
+ "Infura Link": "https://goerli.infura.io/v3/815e996eff9c4caa8cfe1349781148b6",
+ "Network": "goerli",
+ "Contract Web Page": "https://goerli.etherscan.io/address/0x7CcC43cc55206AD89857e5FD9B41962AEa290c91",
+ "Solidity Compiler": "0.8.15",
+ "Last Contract": "0x7CcC43cc55206AD89857e5FD9B41962AEa290c91",
+ "Ganache RPC": "HTTP://127.0.0.1:8545",
+ "Ganache Private Key": "0x5ec89d5d7335ab2f5df76dd05570f4bdb2776f0cf079282bbde17ea33701321a",
+ "Chain ID": 5,
+ "Full Compiler": "v0.8.15+commit.e14f2714",
+ "Addresses": {
+  "Address 1": "0x72615EEA90D35BE859853BeFC069716C3256E8db",
+  "Address 2": "0x8Db1911d01D328321e72f636766Cc2cc176aa957",
+  "Address 3": "0x4DFcC4f47B8ADa1C7a5C620e7EF62Ea1B7e91Ab1",
+  "Address 4": "",
+  "Address 5": "",
+  "Address 6": ""
+ },
+ "Private Keys": {
+  "Private Key 1": "0xcb6cc428559b3e4e9462749f3b1195a105dd8a263315cba3a4e6b3d49681288e",
+  "Private Key 2": "0xf7f575648c04e9083c8f0b5a30261c474f323b7e8e9646924546d9d4ced3a1d7",
+  "Private Key 3": "0xb1f61b5fc798d3cbcdacdb83ceb364ac803a709f832e523eb32537cb737f492c",
+  "Private Key 4": "",
+  "Private Key 5": "",
+  "Private Key 6": ""
+ },
+ "Total Gas used": "18604815",
+ "Total Gwei spent": "287897229",
+ "Total USD spent": "419.94"
+}

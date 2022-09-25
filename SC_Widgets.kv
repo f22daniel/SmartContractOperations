@@ -1,0 +1,222 @@
+
+
+<TabbedPanelItem>
+    markup: True
+    background_normal: ''
+    background_color: (128/255, 64/255, 0, 1)
+    bold: True
+
+<Button>
+    markup: True
+    bold: True
+    font_size: 16
+    background_normal: ''
+    background_color: (128/255, 77/255, 0, 1)
+
+<StandardButton@Button>
+    background_color: (0, 0, 0, 0)
+    col: (128/255, 77/255, 0, 1)
+    on_press: self.col = (30/255, 38/255, 0, 1)
+    on_release: self.col = (128/255, 77/255, 0, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<ResetButton@Button>
+    background_color: (0, 0, 0, 0)
+    col: (0/255, 77/255, 0, 1)
+    on_press: self.col = (30/255, 38/255, 0, 1)
+    on_release: self.col = (0/255, 77/255, 0, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<StandardToggle>
+    markup: True
+    bold: True
+    font_size: 16
+    background_color: (0, 0, 0, 0)
+    col: (128/255, 77/255, 0, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<LabelDescription@Label>
+    markup: True
+    bold: True
+    font_size: 16
+    col: (179/255, 89/255, 0 , 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<LabelValue@Label>
+    markup: True
+    bold: True
+    font_size: 16
+    color: (179/255, 89/255, 0 , 1)
+    canvas.before:
+        Color:
+            rgba: (255/255, 204/255, 128/255 , 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<LabelDescription_2@LabelDescription>
+    size_hint: 1, None
+    height: 25
+
+<LabelValue_2@LabelValue>
+    size_hint: 1, None
+    height: 25
+
+<SeparateLabel@Label>
+    markup: True
+    bold: True
+    size_hint: 0.01, 1
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0 , 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+<SubContractButton>
+    size_hint: None, 1
+    markup: True
+    bold: True
+    font_size: 16
+    background_normal: ''
+    background_color: (128/255, 77/255, 0, 1)
+    width: 200
+
+# Tabulator 1
+<OutputLabel>
+    size_hint: 1, None
+    height: 30
+    font_size: 14
+    # Text alignment adjust
+    text_size: self.size
+    padding_x: 10
+    bold: True
+    halign: 'left'
+    valign: 'middle'
+    canvas.before:
+        Color:
+            rgba: (1, 102/255, 102/255, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<InputLabel>
+    size_hint: 1, None
+    height: 30
+    font_size: 14
+    padding_x: 10
+    bold: True
+    canvas.before:
+        Color:
+            rgba: (102/255, 179/255, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Input>
+    font_size: 14
+    size_hint: 1, None
+    height: 30
+
+<LineLabel@Label>
+    size_hint: 0.01, 1
+    canvas.before:
+        Color:
+            rgba: (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ViewButton>
+    size_hint: (1, None)
+    height: 30
+    bold: True
+    font_size: 14
+    background_color: (0, 0, 0, 0)
+    col: (0, 0, 1, 1)
+    on_press: self.col = (0, 0, 102/255, 1)
+    on_release: self.col = (0, 0, 1, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<NonepayableButton>
+    size_hint: (1, None)
+    height: 30
+    background_color: (0, 0, 0, 0)
+    bold: True
+    font_size: 14
+    col: (1, 173/255, 51/255, 1)
+    on_press: self.col = (153/255, 92/255, 0/255, 1)
+    on_release: self.col = (1, 173/255, 51/255, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<PayableButton>
+    size_hint: (1, None)
+    height: 30
+    background_color: (0, 0, 0, 0)
+    bold: True
+    font_size: 14
+    col: (1, 0, 0, 1)
+    on_press: self.col = (153/255, 0, 0, 1)
+    on_release: self.col = (1, 0, 0, 1)
+    canvas.before:
+        Color:
+            rgba: self.col
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
+
+<TextInput>
+    multiline: False
+    font_size: 14
+
+<ConstructorLabel>
+    size_hint: None, 1
+    width: 150
+    canvas.before:
+        Color:
+            rgba: (179 / 255, 89 / 255, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ClickInput@TextInput>
+
+<FileChooser>
