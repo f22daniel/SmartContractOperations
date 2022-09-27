@@ -1,6 +1,5 @@
 import ast
 import binascii
-# from kivy.clock import Clock
 # import json
 import webbrowser
 
@@ -24,19 +23,21 @@ from SC_Widgets import *
 from SC_Variables import *
 
 # SC variables
-constructor_inputs = []
 w3 = ''
 
 Builder.load_file('SC_App.kv')
 Window.size = (1100, 600)
 
+
 class PrivateKeyPopup(Popup):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+
 class PrivateKeyPopup2(Popup):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
 
 class GanachePopup(Popup):
 
@@ -52,7 +53,7 @@ class GanachePopup(Popup):
                 balance = w3.eth.get_balance(f"{addresses[x]}")
                 balance = Web3.fromWei(int(balance), 'ether')
                 balance = round(balance, 2)
-                ganache_address_index = GanacheAddressIndex(text=f'Address {x+1}: ')
+                ganache_address_index = GanacheAddressIndex(text=f'Address {x + 1}: ')
                 ganache_address_widget = CompilerButton(text=f'{addresses[x]}')
                 ganache_address_balance = GanacheAddressIndex(text=f'{balance} ETH')
                 self.ids[f'{addresses[x]}'] = ganache_address_widget
@@ -284,8 +285,6 @@ class MyLayout(TabbedPanel):
         except requests.exceptions.ConnectionError as e:
             self.ids.StatusBar.text = str(e)
 
-    # ################################################-Tab 3-################################################
-    # Settings Confirmation
     def address_enter(self, state):
 
         if state is False:
@@ -369,9 +368,12 @@ class MyLayout(TabbedPanel):
                 w3 = Web3(Web3.HTTPProvider(settings_test.ganache_rpc))
 
             # ETH Price update
+
             variables_test.ethsc = Etherscan(settings_test.etherscan_api, net='main')
-            variables_test.price = variables_test.ethsc.get_eth_last_price()
-            variables_test.eth_price = variables_test.price['ethusd']
+            # variables_test.price = variables_test.ethsc.get_eth_last_price()
+            # variables_test.eth_price = variables_test.price['ethusd']
+            variables_test.eth_price = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd').json()
+            variables_test.eth_price = variables_test.eth_price['ethereum']['usd']
             variables_test.eth_price = round(float(variables_test.eth_price), 0)
             self.ids.ETH_Price.text = f'{int(variables_test.eth_price)} USD'
             self.ids.eth_price_sc.text = f'{int(variables_test.eth_price)} USD'
@@ -431,14 +433,13 @@ class MyLayout(TabbedPanel):
             pass
 
     def clear(self):
-        global constructor_inputs
         self.ids.Constructor.clear_widgets()
         self.ids.FilePath.text = ''
         variables_test.sc_file_path = ''
         variables_test.sc_file_name = ''
         variables_test.sc_file_keys = []
         variables_test.compiled_contract = ''
-        constructor_inputs = []
+        variables_test.constructor_inputs = []
 
         # Label clearing
         self.ids.GasEstimate.text = ''
@@ -457,7 +458,6 @@ class MyLayout(TabbedPanel):
     def compile(self):
         global compiler_list, full_compiler_list
 
-        iterator = 0
         variables_test.sc_file_name = ''
         subcontract_name = []
         # Open SC file
@@ -505,19 +505,18 @@ class MyLayout(TabbedPanel):
                 variables_test.sc_file_keys.append(j)
             print(f'sc_file_keys: {variables_test.sc_file_keys}')
             # Get Subcontracts
-            for _ in variables_test.sc_file_keys:
+            for iterator, _ in enumerate(variables_test.sc_file_keys):
                 if variables_test.sc_file_keys[iterator] == 'abi':
                     subcontract_name.append(variables_test.sc_file_keys[iterator - 1])
                     print(f'subcontracts: {subcontract_name}')
-                iterator += 1
-            iterator = 0
+
             # Enable/Disable buttons
             self.ids.compile_sc.disabled = True
             self.ids.select_sc.disabled = False
             # Create JSON file
             Settings.update_json(settings_test)
             # Create Buttons
-            for _ in subcontract_name:
+            for iterator, _ in enumerate(subcontract_name):
                 # Parametrise buttons
                 new_toggle = SubContractButton(text=subcontract_name[iterator])
                 # Add ID to buttons
@@ -525,9 +524,9 @@ class MyLayout(TabbedPanel):
                 new_toggle.bind(on_release=partial(self.select_subcontract, new_toggle.text))
                 print(f'ToggleID: {self.ids[subcontract_name[iterator]]}')
                 print(self.ids[subcontract_name[iterator]].state)
-                iterator += 1
                 # Create buttons
                 self.ids.ContractSelection.add_widget(new_toggle)
+
             self.ids.select_sc.disabled = False
             self.ids.StatusBar.text = 'Select Subcontract!'
         except solcx.exceptions.SolcNotInstalled as e:
@@ -544,7 +543,6 @@ class MyLayout(TabbedPanel):
             pass
 
     def select_subcontract(self, text, *args):
-        global constructor_inputs
 
         constructor = []
         constructor_id = 0
@@ -555,7 +553,8 @@ class MyLayout(TabbedPanel):
                 variables_test.compiled_contract = json.loads(file.read())
             print('Checkpoint 1')
             # Get Bytecode
-            variables_test.bytecode = variables_test.compiled_contract['contracts'][f'{variables_test.sc_file_name}'][f'{variables_test.subcontract}']['evm']['bytecode'][
+            variables_test.bytecode = \
+            variables_test.compiled_contract['contracts'][f'{variables_test.sc_file_name}'][f'{variables_test.subcontract}']['evm']['bytecode'][
                 'object']
             print(f'bytecode: {variables_test.bytecode}')
             # Get ABI
@@ -579,7 +578,7 @@ class MyLayout(TabbedPanel):
                     # Add ID to text inputs
                     self.ids[f'ConstructorInput_{constructor_id}'] = new_text
                     print(self.ids[f'ConstructorInput_{constructor_id}'].text)
-                    constructor_inputs.append(self.ids[f'ConstructorInput_{constructor_id}'].text)
+                    variables_test.constructor_inputs.append(self.ids[f'ConstructorInput_{constructor_id}'].text)
                     constructor_id += 1
 
                     # Create widgets
@@ -598,7 +597,7 @@ class MyLayout(TabbedPanel):
             print(f'Error: {e}')
 
     def calculate_upload(self):
-        global constructor_inputs, w3
+        global w3
 
         try:
             constructor_count = 0
@@ -611,18 +610,14 @@ class MyLayout(TabbedPanel):
             print(f'abi: {variables_test.abi}')
             print(f'bytecode: {variables_test.bytecode}')
 
-            for _ in constructor_inputs:
-                if 'uint' in constructor_inputs[constructor_count]:
-                    constructor_inputs[constructor_count] = int(self.ids[f'ConstructorInput_{constructor_count}'].text)
+            for _ in variables_test.constructor_inputs:
+                if 'uint' in variables_test.constructor_inputs[constructor_count]:
+                    variables_test.constructor_inputs[constructor_count] = int(self.ids[f'ConstructorInput_{constructor_count}'].text)
                     constructor_count += 1
                     print('uint')
-                elif 'string' in constructor_inputs[constructor_count]:
-                    constructor_inputs[constructor_count] = str(self.ids[f'ConstructorInput_{constructor_count}'].text)
+                elif 'string' in variables_test.constructor_inputs[constructor_count]:
+                    variables_test.constructor_inputs[constructor_count] = str(self.ids[f'ConstructorInput_{constructor_count}'].text)
                     constructor_count += 1
-                # else:
-                #     constructor_inputs[constructor_count] = self.ids[f'ConstructorInput_{constructor_count}'].text
-                #     constructor_count += 1
-            constructor_inputs = tuple(constructor_inputs)
             # Building Upload
             contract = w3.eth.contract(abi=variables_test.abi, bytecode=variables_test.bytecode)
             print(f'Infura: {settings_test.infura_api}')
@@ -631,7 +626,7 @@ class MyLayout(TabbedPanel):
                 variables_test.nonce = w3.eth.getTransactionCount(settings_test.ganache_address)
                 w3_balance = w3.eth.getTransactionCount(settings_test.ganache_address)
                 print(f'Balance: {w3_balance}')
-                variables_test.transaction = contract.constructor(*constructor_inputs).buildTransaction(
+                variables_test.transaction = contract.constructor(*tuple(variables_test.constructor_inputs)).buildTransaction(
                     {'chainId': settings_test.ganache_id, "gasPrice": w3.eth.gasPrice,
                      'from': settings_test.ganache_address, 'nonce': variables_test.nonce})
                 print(f'transaction: {variables_test.transaction}')
@@ -639,7 +634,7 @@ class MyLayout(TabbedPanel):
             else:
                 variables_test.nonce = w3.eth.getTransactionCount(settings_test.address)
                 print(f'chain ID: {settings_test.chain_id}')
-                variables_test.transaction = contract.constructor(*constructor_inputs).buildTransaction(
+                variables_test.transaction = contract.constructor(*tuple(variables_test.constructor_inputs)).buildTransaction(
                     {'chainId': settings_test.chain_id, "gasPrice": w3.eth.gasPrice, 'from': settings_test.address, 'nonce': variables_test.nonce})
                 print(f'transaction: {variables_test.transaction}')
             # Gas Estimation
@@ -692,7 +687,7 @@ class MyLayout(TabbedPanel):
             self.ids.StatusBar.text = str(e)
 
     def deploy_sc(self):
-        global constructor_inputs, w3
+        global w3
 
         signed_txn = ''
 
@@ -769,7 +764,6 @@ class MyLayout(TabbedPanel):
         global w3
 
         try:
-            iterator = 0
             variables_test.view_mutability = []
             variables_test.nonpayable_mutability = []
             variables_test.payable_mutability = []
@@ -781,7 +775,8 @@ class MyLayout(TabbedPanel):
                     json.dump(variables_test.compiled_contract, file, indent=1)
                 print(f'sc file name: {variables_test.sc_file_name}')
                 print(f'Subcontract: {variables_test.subcontract}')
-                variables_test.contract_abi = variables_test.compiled_contract['contracts'][f'{variables_test.sc_file_name}'][f'{variables_test.subcontract}']['abi']
+                variables_test.contract_abi = variables_test.compiled_contract['contracts'][f'{variables_test.sc_file_name}'][f'{variables_test.subcontract}'][
+                    'abi']
 
             else:
                 w3 = Web3(Web3.HTTPProvider(settings_test.infura_link))
@@ -797,18 +792,15 @@ class MyLayout(TabbedPanel):
             print(f'abi: {variables_test.contract_abi}')
             self.ids.StatusBar_1.text = f'Connected to {variables_test.contract_address}'
             # View Button creation
-            for _ in variables_test.contract_abi:
+            for iterator, _ in enumerate(variables_test.contract_abi):
                 print(f'lines: {variables_test.contract_abi[iterator]}')
                 x = variables_test.contract_abi[iterator]
                 for n in x:
                     print(f'sub: {x[n]}')
                     if x[n] == 'constructor':
                         variables_test.contract_abi.pop(iterator)
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.contract_abi:
+            for iterator, _ in enumerate(variables_test.contract_abi):
                 # print(f'lines: {contract_abi[iterator]}')
                 x = variables_test.contract_abi[iterator]
                 for n in x:
@@ -822,36 +814,27 @@ class MyLayout(TabbedPanel):
                         variables_test.nonpayable_mutability.append(variables_test.contract_abi[iterator])
                     if x[n] == 'payable':
                         variables_test.payable_mutability.append(variables_test.contract_abi[iterator])
-                iterator += 1
 
-            iterator = 0
-            for _ in variables_test.view_mutability:
+            for iterator, _ in enumerate(variables_test.view_mutability):
                 print((variables_test.view_mutability[iterator]).get('name'))
                 view_button = ViewButton(text=(variables_test.view_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.view_mutability[iterator]).get("name")}'] = view_button
                 self.ids.view_buttons.add_widget(view_button)
                 view_button.bind(on_release=partial(self.view_function_execution, view_button.text))
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.nonpayable_mutability:
+            for iterator, _ in enumerate(variables_test.nonpayable_mutability):
                 print((variables_test.nonpayable_mutability[iterator]).get('name'))
                 nonpayable_button = NonepayableButton(text=(variables_test.nonpayable_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.nonpayable_mutability[iterator]).get("name")}'] = nonpayable_button
                 self.ids.nonpayable_buttons.add_widget(nonpayable_button)
                 nonpayable_button.bind(on_release=partial(self.nonpayable_function_execution, nonpayable_button.text))
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.payable_mutability:
+            for iterator, _ in enumerate(variables_test.payable_mutability):
                 print((variables_test.payable_mutability[iterator]).get('name'))
                 payable_button = PayableButton(text=(variables_test.payable_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.payable_mutability[iterator]).get("name")}'] = payable_button
                 self.ids.payable_buttons.add_widget(payable_button)
                 payable_button.bind(on_release=partial(self.payable_function_execution, payable_button.text))
-                iterator += 1
 
             self.ids.UploadedSC.disabled = True
             self.ids.ExternalSC.disabled = True
@@ -866,7 +849,6 @@ class MyLayout(TabbedPanel):
     def connect_to_sc(self):
         global w3
         try:
-            iterator = 0
             variables_test.view_mutability = []
             variables_test.nonpayable_mutability = []
             variables_test.payable_mutability = []
@@ -889,18 +871,15 @@ class MyLayout(TabbedPanel):
             self.ids.StatusBar_1.text = f'Connected to {variables_test.contract_address}'
 
             # View Button creation
-            for _ in variables_test.contract_abi:
+            for iterator, _ in enumerate(variables_test.contract_abi):
                 print(f'lines: {variables_test.contract_abi[iterator]}')
                 x = variables_test.contract_abi[iterator]
                 for n in x:
                     print(f'sub: {x[n]}')
                     if x[n] == 'constructor':
                         variables_test.contract_abi.pop(iterator)
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.contract_abi:
+            for iterator, _ in enumerate(variables_test.contract_abi):
                 print(f'k: {iterator}')
                 x = variables_test.contract_abi[iterator]
                 for n in x:
@@ -913,37 +892,27 @@ class MyLayout(TabbedPanel):
                         variables_test.nonpayable_mutability.append(variables_test.contract_abi[iterator])
                     if x[n] == 'payable':
                         variables_test.payable_mutability.append(variables_test.contract_abi[iterator])
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.view_mutability:
+            for iterator, _ in enumerate(variables_test.view_mutability):
                 print((variables_test.view_mutability[iterator]).get('name'))
                 view_button = ViewButton(text=(variables_test.view_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.view_mutability[iterator]).get("name")}'] = view_button
                 self.ids.view_buttons.add_widget(view_button)
                 view_button.bind(on_release=partial(self.view_function_execution, view_button.text))
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.nonpayable_mutability:
+            for iterator, _ in enumerate(variables_test.nonpayable_mutability):
                 print((variables_test.nonpayable_mutability[iterator]).get('name'))
                 nonpayable_button = NonepayableButton(text=(variables_test.nonpayable_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.nonpayable_mutability[iterator]).get("name")}'] = nonpayable_button
                 self.ids.nonpayable_buttons.add_widget(nonpayable_button)
                 nonpayable_button.bind(on_release=partial(self.nonpayable_function_execution, nonpayable_button.text))
-                iterator += 1
 
-            iterator = 0
-
-            for _ in variables_test.payable_mutability:
+            for iterator, _ in enumerate(variables_test.payable_mutability):
                 print((variables_test.payable_mutability[iterator]).get('name'))
                 payable_button = PayableButton(text=(variables_test.payable_mutability[iterator]).get('name'))
                 self.ids[f'{(variables_test.payable_mutability[iterator]).get("name")}'] = payable_button
                 self.ids.payable_buttons.add_widget(payable_button)
                 payable_button.bind(on_release=partial(self.payable_function_execution, payable_button.text))
-                iterator += 1
 
             self.ids.UploadedSC.disabled = True
             self.ids.ExternalSC.disabled = True
@@ -960,33 +929,28 @@ class MyLayout(TabbedPanel):
 
         view_function = ''
         variables_test.input_name = ''
-        iterator = 0
         self.ids.output_layout.clear_widgets()
         self.ids.input_layout.clear_widgets()
 
         try:
-            for _ in variables_test.view_mutability:
+            for iterator, _ in enumerate(variables_test.view_mutability):
                 if text == variables_test.view_mutability[iterator].get('name'):
                     view_function = variables_test.view_mutability[iterator]
                     variables_test.input_name = variables_test.view_mutability[iterator].get('name')
                     print(view_function)
                     break
-                iterator += 1
             # Output widgets
-            iterator = 0
             variables_test.view_outputs = view_function.get('outputs')
-            for _ in variables_test.view_outputs:
+            for iterator, _ in enumerate(variables_test.view_outputs):
                 print(variables_test.view_outputs[iterator].get('name'))
                 output_label = OutputLabel(text=f'{variables_test.view_outputs[iterator].get("name")}: ')
                 self.ids[f'output_label_{iterator}'] = output_label
                 self.ids.output_layout.add_widget(output_label)
-                iterator += 1
             # Input widgets
-            iterator = 0
             variables_test.view_inputs = view_function.get('inputs')
             print(f'View inputs: {variables_test.view_inputs}')
             if len(variables_test.view_inputs) != 0:
-                for _ in variables_test.view_inputs:
+                for iterator, _ in enumerate(variables_test.view_inputs):
                     print(variables_test.view_inputs[iterator].get('name'))
                     input_label = InputLabel(text=f'{variables_test.view_inputs[iterator].get("name")}: ')
                     input_text = ClickInput(text=f'{variables_test.view_inputs[iterator].get("type")}')
@@ -996,7 +960,6 @@ class MyLayout(TabbedPanel):
                     self.ids.input_layout.add_widget(input_text)
                     # Enable execute button
                     self.ids.execute.disabled = False
-                    iterator += 1
                 variables_test.distinguish = 'view'
             else:
                 self.ids.execute.disabled = True
@@ -1006,11 +969,10 @@ class MyLayout(TabbedPanel):
                     function_run = eval(f'variables_test.uploaded_sc.functions.{variables_test.input_name}().call()')
                     self.ids.output_label_0.text = f'{self.ids[f"output_label_0"].text} {function_run}'
                 else:
-                    iterator = 0
-                    for _ in variables_test.view_outputs:
+                    for iterator, _ in enumerate(variables_test.view_outputs):
                         function_run = eval(f'variables_test.uploaded_sc.functions.{variables_test.input_name}().call()[{iterator}]')
                         self.ids[f"output_label_{iterator}"].text = f'{self.ids[f"output_label_{iterator}"].text} {function_run}'
-                        iterator += 1
+
         except web3.exceptions.ContractLogicError as e:
             self.ids.StatusBar_1.text = str(e)
             print(e)
@@ -1029,7 +991,6 @@ class MyLayout(TabbedPanel):
         variables_test.gas_price = float()
 
         try:
-            iterator = 0
             nonpayable_function = ''
             if settings_test.network != 'ganache':
                 variables_test.my_address = settings_test.address
@@ -1041,31 +1002,27 @@ class MyLayout(TabbedPanel):
             self.ids.input_layout.clear_widgets()
             print(f'text: {text}')
             variables_test.function_name = text
-            for _ in variables_test.nonpayable_mutability:
+            for iterator, _ in enumerate(variables_test.nonpayable_mutability):
                 if text == variables_test.nonpayable_mutability[iterator].get('name'):
                     nonpayable_function = variables_test.nonpayable_mutability[iterator]
                     # print(f'nonpayable: {variables_test.nonpayable_function}')
                     break
-                iterator += 1
             # Output widgets
-            iterator = 0
             nonpayable_outputs = nonpayable_function.get('outputs')
             if len(nonpayable_outputs) != 0:
-                for _ in nonpayable_outputs:
+                for iterator, _ in enumerate(nonpayable_outputs):
                     print(f"nonpayable_name: {nonpayable_outputs[iterator].get('name')}")
                     output_label = OutputLabel(text=f'{nonpayable_outputs[iterator].get("name")}: ')
                     self.ids.output_layout.add_widget(output_label)
-                    iterator += 1
             else:
                 pass
             # Input widgets
-            iterator = 0
             variables_test.nonpayable_inputs = nonpayable_function.get('inputs')
             print(f'nonpayable inputs: {variables_test.nonpayable_inputs}')
             variables_test.distinguish = 'nonpayable'
             print(f'distinguish {variables_test.distinguish}')
             if len(variables_test.nonpayable_inputs) != 0:
-                for _ in variables_test.nonpayable_inputs:
+                for iterator, _ in enumerate(variables_test.nonpayable_inputs):
                     print(variables_test.nonpayable_inputs[iterator].get('name'))
                     input_label = InputLabel(text=f'{variables_test.nonpayable_inputs[iterator].get("name")}:')
                     input_text = ClickInput(text=f'{variables_test.nonpayable_inputs[iterator].get("type")}')
@@ -1073,8 +1030,6 @@ class MyLayout(TabbedPanel):
                     # Add widgets
                     self.ids.input_layout.add_widget(input_label)
                     self.ids.input_layout.add_widget(input_text)
-
-                    iterator += 1
                 # Enable execute button
                 self.ids.calculate_transaction.disabled = False
                 self.ids.execute.disabled = True
@@ -1098,7 +1053,6 @@ class MyLayout(TabbedPanel):
     def payable_function_execution(self, text, *args):
         global w3
 
-        iterator = 0
         payable_function = ''
         variables_test.my_address = settings_test.address
         variables_test.amount_sent = int()
@@ -1108,31 +1062,27 @@ class MyLayout(TabbedPanel):
         self.ids.output_layout.clear_widgets()
         self.ids.input_layout.clear_widgets()
 
-        for _ in variables_test.payable_mutability:
+        for iterator, _ in enumerate(variables_test.payable_mutability):
             if text == variables_test.payable_mutability[iterator].get('name'):
                 payable_function = variables_test.payable_mutability[iterator]
                 print(payable_function)
                 break
-            iterator += 1
         # Output widgets
-        iterator = 0
         payable_outputs = payable_function.get('outputs')
         if len(payable_outputs) != 0:
-            for _ in payable_outputs:
+            for iterator, _ in enumerate(payable_outputs):
                 print(payable_outputs[iterator].get('name'))
                 output_label = OutputLabel(text=f'{payable_outputs[iterator].get("name")}: ')
                 self.ids.output_layout.add_widget(output_label)
-                iterator += 1
         else:
             pass
         # Input widgets
-        iterator = 0
         variables_test.payable_inputs = payable_function.get('inputs')
         variables_test.distinguish = 'payable'
         print(f'distinguish {variables_test.distinguish}')
         print(variables_test.payable_inputs)
         if len(variables_test.payable_inputs) != 0:
-            for _ in variables_test.payable_inputs:
+            for iterator, _ in enumerate(variables_test.payable_inputs):
                 print(variables_test.payable_inputs[iterator].get('name'))
                 input_label = InputLabel(text=f'{variables_test.payable_inputs[iterator].get("name")}:')
                 input_text = ClickInput(text=f'{variables_test.payable_inputs[iterator].get("type")}')
@@ -1140,8 +1090,6 @@ class MyLayout(TabbedPanel):
                 # Add widgets
                 self.ids.input_layout.add_widget(input_label)
                 self.ids.input_layout.add_widget(input_text)
-
-                iterator += 1
             # Enable execute button
             self.ids.calculate_transaction.disabled = False
             self.ids.execute.disabled = True
@@ -1175,18 +1123,15 @@ class MyLayout(TabbedPanel):
     def calculate_transaction(self):
 
         function_inputs = []
-        iterator = 0
 
         if variables_test.distinguish == 'nonpayable':
             try:
-                for _ in variables_test.nonpayable_inputs:
+                for iterator, _ in enumerate(variables_test.nonpayable_inputs):
                     if not (self.ids[f'input_label_{iterator}'].text).isalpha():
                         n = int(self.ids[f'input_label_{iterator}'].text)
                         function_inputs.append(n)
-                        iterator += 1
                     else:
                         function_inputs.append(self.ids[f'input_label_{iterator}'].text)
-                        iterator += 1
 
                 function_inputs = tuple(function_inputs)
                 print(f'function inputs {function_inputs}')
@@ -1195,8 +1140,10 @@ class MyLayout(TabbedPanel):
                 if settings_test.network == 'ganache':
                     variables_test.nonce = w3.eth.getTransactionCount(settings_test.ganache_address)
                     print(f'Ganache nonce: {variables_test.nonce}')
-                    variables_test.transaction = eval(f"variables_test.uploaded_sc.functions.{variables_test.function_name}(*function_inputs).buildTransaction")(
-                        {'chainId': settings_test.ganache_id, "gasPrice": w3.eth.gasPrice, 'from': settings_test.ganache_address, 'nonce': int(variables_test.nonce)})
+                    variables_test.transaction = eval(
+                        f"variables_test.uploaded_sc.functions.{variables_test.function_name}(*function_inputs).buildTransaction")(
+                        {'chainId': settings_test.ganache_id, "gasPrice": w3.eth.gasPrice, 'from': settings_test.ganache_address,
+                         'nonce': int(variables_test.nonce)})
                 else:
                     variables_test.nonce = w3.eth.getTransactionCount(settings_test.address)
                     variables_test.transaction = eval(
@@ -1212,14 +1159,12 @@ class MyLayout(TabbedPanel):
 
         if variables_test.distinguish == 'payable':
             try:
-                for _ in variables_test.payable_inputs:
-                    if not (self.ids[f'input_label_{iterator}'].text).isalpha():
+                for iterator, _ in enumerate(variables_test.payable_inputs):
+                    if (self.ids[f'input_label_{iterator}'].text).isnumeric():
                         n = int(self.ids[f'input_label_{iterator}'].text)
                         function_inputs.append(n)
-                        iterator += 1
                     else:
                         function_inputs.append(self.ids[f'input_label_{iterator}'].text)
-                        iterator += 1
 
                 function_inputs = tuple(function_inputs)
                 print(f'function inputs {function_inputs}')
@@ -1236,7 +1181,8 @@ class MyLayout(TabbedPanel):
                         {'chainId': settings_test.ganache_id, "gasPrice": w3.eth.gasPrice,
                          'from': settings_test.ganache_address, 'nonce': variables_test.nonce, 'value': int(variables_test.amount_sent)})
                 else:
-                    variables_test.transaction = eval(f"variables_test.uploaded_sc.functions.{variables_test.function_name}(*function_inputs).buildTransaction")(
+                    variables_test.transaction = eval(
+                        f"variables_test.uploaded_sc.functions.{variables_test.function_name}(*function_inputs).buildTransaction")(
                         {'chainId': settings_test.chain_id, "gasPrice": w3.eth.gasPrice,
                          'from': variables_test.my_address, 'nonce': variables_test.nonce, 'value': int(variables_test.amount_sent)})
                     print(f'transaction: {variables_test.transaction}')
@@ -1250,7 +1196,6 @@ class MyLayout(TabbedPanel):
     def transact(self):
         global w3
 
-        iterator = 0
         signed_store_txn = ''
         # View execution
         if variables_test.distinguish == 'view':
@@ -1258,17 +1203,14 @@ class MyLayout(TabbedPanel):
             function_inputs = []
             print(f'Input name: {variables_test.input_name}')
             try:
-                for _ in variables_test.view_inputs:
-                    if not (self.ids[f'input_label_{iterator}'].text).isalpha():
+                for iterator, _ in enumerate(variables_test.view_inputs):
+                    if not self.ids[f'input_label_{iterator}'].text.isalpha():
                         print('Int selected')
                         n = int(self.ids[f'input_label_{iterator}'].text)
                         function_inputs.append(n)
-                        iterator += 1
-
                     else:
                         print('Str selected')
                         function_inputs.append(self.ids[f'input_label_{iterator}'].text)
-                        iterator += 1
 
                 function_inputs = tuple(function_inputs)
                 print(f'function inputs {function_inputs}')
@@ -1277,13 +1219,11 @@ class MyLayout(TabbedPanel):
                     function_run = eval(f'variables_test.uploaded_sc.functions.{variables_test.input_name}(*function_inputs).call()')
                     self.ids.output_label_0.text = f'{self.ids[f"output_label_0"].text} {function_run}'
                 else:
-                    iterator = 0
-                    for _ in variables_test.view_outputs:
+                    for iterator, _ in enumerate(variables_test.view_outputs):
                         self.ids[f"output_label_{iterator}"].text = f'{variables_test.view_outputs[iterator].get("name")}: '
                         function_run = eval(f'variables_test.uploaded_sc.functions.{variables_test.input_name}(*function_inputs).call()[{iterator}]')
                         self.ids[
                             f"output_label_{iterator}"].text = f'{self.ids[f"output_label_{iterator}"].text} {function_run}'
-                        iterator += 1
                 self.ids.StatusBar_1.text = f'Connected to {variables_test.contract_address}'
 
             except web3.exceptions.ValidationError as e:
@@ -1415,7 +1355,6 @@ class MyLayout(TabbedPanel):
 
         if settings_test.network != 'ganache':
             short_address = settings_test.address
-
         else:
             short_address = settings_test.ganache_address
 
@@ -1436,11 +1375,11 @@ class MyLayout(TabbedPanel):
         self.ids.last_usd_spent_sc.text = f'{variables_test.upload_cost_usd}'
 
         # Total gas spent
-        self.ids.total_gas_used_sc.text = str(eval(f'{self.ids.total_gas_used_sc.text}+{self.ids.last_gas_spent_sc.text}'))
-        self.ids.total_gwei_spent_sc.text = str(eval(f'{self.ids.total_gwei_spent_sc.text}+{self.ids.last_gwei_spent_sc.text}'))
-        self.ids.total_usd_spent_sc.text = str(eval(f'{self.ids.total_usd_spent_sc.text}+{self.ids.last_usd_spent_sc.text}'))
-        self.ids.total_gwei_spent.text = str(eval(f'{self.ids.total_gwei_spent.text}+{self.ids.last_gwei_spent.text}'))
-        self.ids.total_usd_spent.text = str(eval(f'{self.ids.total_usd_spent.text}+{self.ids.last_usd_spent.text}'))
+        self.ids.total_gas_used_sc.text = str(f'{float(self.ids.total_gas_used_sc.text) + float(self.ids.last_gas_spent_sc.text)}')
+        self.ids.total_gwei_spent_sc.text = str(f'{float(self.ids.total_gwei_spent_sc.text) + float(self.ids.last_gwei_spent_sc.text)}')
+        self.ids.total_usd_spent_sc.text = str(float(self.ids.total_usd_spent_sc.text) + float(self.ids.last_usd_spent_sc.text))
+        self.ids.total_gwei_spent.text = str(float(self.ids.total_gwei_spent.text) + float(self.ids.last_gwei_spent.text))
+        self.ids.total_usd_spent.text = str(float(self.ids.total_gwei_spent.text) + float(self.ids.last_usd_spent.text))
 
         settings_test.total_gas_used = f'{self.ids.total_gas_used_sc.text}'
         settings_test.total_gwei_spent = f'{self.ids.total_gwei_spent.text}'
@@ -1507,6 +1446,7 @@ class MyLayout(TabbedPanel):
             print(f'Clicked on {instance}')
         else:
             print(f'Clicked off {instance}')
+
 
 # #############################################-Class Setup-#############################################
 
